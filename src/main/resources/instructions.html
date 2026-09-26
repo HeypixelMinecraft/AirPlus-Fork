@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>安装指南 · Forge Mod 1.8.9</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3efe4;
+  --card:#fffdf8;
+  --ink:#1e1a14;
+  --ink-2:#6a5e50;
+  --ink-3:#a89d8c;
+  --line:#e0d6c0;
+  --line-2:#cfc4a8;
+  --grass:#5d8b3a;
+  --grass-l:#7baa4e;
+  --grass-d:#3d6320;
+  --dirt:#8b6f47;
+  --dirt-d:#5e4a30;
+  --gold:#d4a020;
+  --warn:#c44a2e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans SC',-apple-system,system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+body::before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 15% 12%,rgba(93,139,58,0.05) 0%,transparent 45%),
+    radial-gradient(circle at 85% 88%,rgba(139,111,71,0.05) 0%,transparent 45%);
+}
+.page{
+  max-width:680px;
+  margin:0 auto;
+  padding:56px 28px 64px;
+  position:relative;
+  z-index:1;
+  animation:fadeUp .5s ease-out both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== 标题 ===== */
+.hero{
+  display:flex;align-items:center;gap:18px;margin-bottom:8px;
+}
+.grass-cube{
+  width:48px;height:48px;flex-shrink:0;position:relative;
+  background:linear-gradient(180deg,#5d8b3a 0 38%,#4a7a2a 38% 40%,#8b6f47 40% 100%);
+  border:3px solid #1e1a14;
+  box-shadow:
+    inset 3px 3px 0 rgba(255,255,255,0.18),
+    inset -3px -3px 0 rgba(0,0,0,0.28),
+    0 3px 0 #1e1a14,
+    0 5px 10px rgba(30,26,20,0.22);
+}
+.grass-cube::before{
+  content:"";position:absolute;
+  top:8px;left:5px;width:4px;height:4px;background:rgba(255,255,255,0.25);
+  box-shadow:8px -2px 0 rgba(255,255,255,0.15),20px 1px 0 rgba(0,0,0,0.12),4px 20px 0 rgba(0,0,0,0.1);
+}
+.hero h1{
+  font-size:25px;font-weight:900;letter-spacing:-0.4px;line-height:1.2;
+}
+.hero .ver{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;color:var(--ink-2);margin-top:5px;font-weight:500;
+}
+.hero .ver b{
+  color:var(--grass-d);background:rgba(93,139,58,0.12);
+  padding:2px 7px;border-radius:3px;font-weight:600;
+}
+.intro{
+  color:var(--ink-2);font-size:15px;margin:22px 0 32px;
+  padding-bottom:24px;border-bottom:1px solid var(--line);line-height:1.75;
+}
+.intro b{color:var(--ink);font-weight:600}
+
+/* ===== 步骤 ===== */
+.steps{position:relative}
+.step{
+  display:flex;gap:18px;position:relative;padding-bottom:22px;
+}
+.step:last-child{padding-bottom:0}
+.step:not(:last-child)::before{
+  content:"";position:absolute;
+  left:21px;top:46px;bottom:0;
+  border-left:2px dashed var(--line-2);z-index:0;
+}
+.step-num{
+  flex-shrink:0;width:44px;height:44px;
+  background:var(--grass);border:3px solid #1e1a14;
+  color:#fff;font-weight:900;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;
+  box-shadow:
+    inset 3px 3px 0 var(--grass-l),
+    inset -3px -3px 0 var(--grass-d),
+    0 3px 0 #1e1a14,
+    0 5px 8px rgba(30,26,20,0.18);
+  z-index:2;position:relative;
+}
+.step-body{
+  flex:1;background:var(--card);
+  border:1px solid var(--line);border-radius:4px;
+  padding:18px 22px;
+  box-shadow:0 1px 2px rgba(60,50,30,0.04),0 4px 12px rgba(60,50,30,0.04);
+  transition:box-shadow .2s,transform .2s;
+}
+.step-body:hover{
+  box-shadow:0 2px 4px rgba(60,50,30,0.06),0 8px 20px rgba(60,50,30,0.08);
+  transform:translateY(-1px);
+}
+.step-body h3{
+  font-size:16px;font-weight:700;margin-bottom:6px;color:var(--ink);
+}
+.step-body p{
+  font-size:14px;color:var(--ink-2);line-height:1.7;margin:0;
+}
+.step-body p b{color:var(--ink);font-weight:600}
+.step-body p+p{margin-top:8px}
+
+.code-path{
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;
+  background:#faf6ea;border:1px solid var(--line);
+  border-left:3px solid var(--dirt);
+  border-radius:0 3px 3px 0;padding:9px 13px;
+  margin-top:11px;color:var(--dirt-d);
+  word-break:break-all;display:flex;align-items:center;gap:8px;
+}
+.code-path+.code-path{margin-top:8px}
+.tag{
+  display:inline-block;font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:2px;flex-shrink:0;
+  letter-spacing:0.5px;
+}
+.tag.win{background:#dbe8fc;color:#1a5fa3}
+.tag.mac{background:#f0e6d4;color:#8a6d3b}
+
+.tip{
+  margin-top:12px;padding:10px 13px;
+  background:#fef8e4;border:1px solid #ecd870;
+  border-left:3px solid var(--gold);
+  border-radius:0 3px 3px 0;
+  font-size:13px;color:#7a5e1a;line-height:1.6;
+}
+.tip b{color:#5a4609}
+.warn{
+  margin-top:12px;padding:10px 13px;
+  background:#fce9e2;border:1px solid #f0a888;
+  border-left:3px solid var(--warn);
+  border-radius:0 3px 3px 0;
+  font-size:13px;color:#9a341e;line-height:1.6;
+}
+.warn b{color:#7a2812}
+
+/* ===== 完成 ===== */
+.done{
+  margin-top:32px;padding:20px 22px;
+  background:linear-gradient(135deg,rgba(93,139,58,0.07) 0%,rgba(139,111,71,0.05) 100%);
+  border:1px solid var(--line);border-left:4px solid var(--grass);
+  border-radius:0 4px 4px 0;
+  display:flex;align-items:center;gap:16px;
+}
+.done-check{
+  width:34px;height:34px;flex-shrink:0;
+  background:var(--grass);border:3px solid #1e1a14;
+  position:relative;
+  box-shadow:0 3px 0 #1e1a14,0 4px 8px rgba(30,26,20,0.15);
+}
+.done-check::after{
+  content:"";position:absolute;
+  left:8px;top:6px;width:10px;height:16px;
+  border-right:3px solid #fff;border-bottom:3px solid #fff;
+  transform:rotate(45deg);
+}
+.done h4{font-size:15px;font-weight:700;margin-bottom:2px}
+.done p{font-size:13px;color:var(--ink-2);margin:0;line-height:1.55}
+
+.foot{
+  margin-top:44px;text-align:center;
+  font-size:11px;color:var(--ink-3);
+  font-family:'JetBrains Mono',monospace;letter-spacing:1px;
+}
+
+@media(max-width:600px){
+  .page{padding:40px 18px}
+  .hero h1{font-size:21px}
+  .step-body{padding:16px 18px}
+  .step{gap:14px}
+  .step-num{width:38px;height:38px;font-size:16px}
+  .step:not(:last-child)::before{left:18px;top:40px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <div class="grass-cube" aria-hidden="true"></div>
+    <div>
+      <h1>AirPlus 安装指南</h1>
+      <div class="ver">Minecraft <b>1.8.9</b> &nbsp;·&nbsp; Forge <b>1.8.9</b></div>
+    </div>
+  </header>
+
+  <p class="intro">
+    本指南引导你完成 AirPlus 的安装与启动。全程约 <b>2 分钟</b>，只需把一个文件放到正确位置，然后启动游戏。
+  </p>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>确认 Minecraft 版本</h3>
+        <p>打开启动器，确认已安装 <b>Minecraft 1.8.9</b>。如未安装，在「启动器 → 安装」中新建一个 1.8.9 原版。</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>安装 Forge</h3>
+        <p>下载 <b>Forge 1.8.9</b>（推荐 11.15.1.1902），双击安装器，选择「Install client」完成安装。安装后启动器里会出现一个名为 <b>Forge 1.8.9</b> 的新配置。</p>
+        <div class="tip"><b>已装过 Forge？</b> 跳过这一步即可。</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>打开 mods 文件夹</h3>
+        <p>进入 <b>.minecraft</b> 目录下的 <b>mods</b> 文件夹。如果没有这个文件夹，手动新建一个名为 <code style="font-family:'JetBrains Mono',monospace;background:#faf6ea;padding:1px 5px;border-radius:2px;font-size:12px;color:var(--dirt-d)">mods</code> 的文件夹即可。</p>
+        <div class="code-path"><span class="tag win">Win</span>%APPDATA%\.minecraft\mods\</div>
+        <div class="code-path"><span class="tag mac">Mac</span>~/Library/Application Support/minecraft/mods/</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>放入 Mod 文件</h3>
+        <p>把下载好的 <b>.jar</b> 文件直接拖进 mods 文件夹。不需要解压，不需要改名，拖进去就行。</p>
+        <div class="warn"><b>注意：</b>本 Mod 仅用于客户端，不要放入服务端 mods 目录。</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>启动游戏</h3>
+        <p>回到启动器，选择 <b>Forge 1.8.9</b> 配置，点击 <b>Play</b>。游戏主界面左下角应显示 Forge 版本信息与已加载 Mod 数量。</p>
+        <div class="tip"><b>进入世界后</b> 按右 Shift 键可呼出客户端菜单。</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="done">
+    <div class="done-check"></div>
+    <div>
+      <h4>大功告成</h4>
+      <p>左下角出现 Forge 信息即代表 Mod 已成功加载，可以进入世界使用了。</p>
+    </div>
+  </div>
+
+  <div class="foot">— END —</div>
+
+</div>
+</body>
+</html>

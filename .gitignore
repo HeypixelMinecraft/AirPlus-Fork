@@ -1,0 +1,10 @@
+/run/
+/out/
+/logs/
+/build/
+/bin/
+/.settings/
+/.gradle/
+/.kotlin/
+/.idea/
+/.trae/

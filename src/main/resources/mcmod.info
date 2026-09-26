@@ -1,0 +1,16 @@
+[
+  {
+    "modid": "airplus",
+    "name": "AirPlus",
+    "description": "A free mixin-based injection hacked-client",
+    "version": "${version}",
+    "mcversion": "1.8.9",
+    "url": "https://github.com/lmx0721/airplus",
+    "updateUrl": "",
+    "authorList": ["CCBlueX","LMX"],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
