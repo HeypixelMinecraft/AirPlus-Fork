@@ -4,6 +4,8 @@
 
 **一个基于 Mixin 注入的 Minecraft 1.8.9 Forge 开源客户端**
 
+**基于AirClient重构**
+
 基于 [LiquidBounce Legacy](https://github.com/CCBlueX/LiquidBounce/tree/legacy) 二次开发，深度融合 Kotlin 现代化特性
 
 ![Minecraft](https://img.shields.io/badge/Minecraft-1.8.9-8b89c4?logo=minecraft&logoColor=white)
