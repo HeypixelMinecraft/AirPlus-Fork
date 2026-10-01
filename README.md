@@ -16,6 +16,8 @@
 
 ---
 
+https://github.com/user-attachments/assets/e96f3538-1bc5-4332-89fb-057698ff0a6b
+
 ## 简介
 
 AirPlus 是在 LiquidBounce Legacy（b100 最终版）基础上构建的客户端，保留了原版成熟的 Mixin 注入架构与模块体系，并对多个模块进行了增强与重构。大部分代码移植自AirClient项目。
