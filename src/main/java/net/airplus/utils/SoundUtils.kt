@@ -60,6 +60,7 @@ fun playWavSound(resourcePath: String) {
 
 /**
  * 异步播放WAV音效
+ * 使用 SourceDataLine 流式播放，比 Clip 更可靠（Clip 在游戏运行环境中可能获取音频线失败）
  * @param resourcePath 资源路径
  */
 fun asyncPlayWav(resourcePath: String) {
@@ -70,15 +71,20 @@ fun asyncPlayWav(resourcePath: String) {
                     SoundUtils::class.java.getResourceAsStream("/assets/minecraft/$resourcePath")
                 )
             )
-            val clip = AudioSystem.getClip()
-            clip.open(audioStream)
-            clip.start()
-            
-            while (clip.isRunning) {
-                Thread.sleep(100)
+            val format = audioStream.format
+            val line = AudioSystem.getSourceDataLine(format)
+            line.open(format, 8192)
+            line.start()
+
+            val buffer = ByteArray(4096)
+            var bytesRead: Int
+            while (audioStream.read(buffer).also { bytesRead = it } != -1) {
+                line.write(buffer, 0, bytesRead)
             }
-            
-            clip.close()
+
+            line.drain()
+            line.stop()
+            line.close()
             audioStream.close()
         } catch (e: Throwable) {
             ClientUtils.LOGGER.error("[SoundUtils] 异步播放失败: ${e.message}")

@@ -29,7 +29,7 @@ class SysUtils {
         val isFileInDir = File(FileManager.fontsDir, filePath)
         if (!isFileInDir.exists()) {
             val inputStream: InputStream =
-                AirPlus::class.java.classLoader.getResourceAsStream("assets/minecraft/airplus/font/${filePath}")
+                AirPlus::class.java.classLoader.getResourceAsStream("assets/minecraft/airplus/fonts/${filePath}")
                     ?: throw IllegalStateException("$filePath not found in resources")
             Files.copy(inputStream, isFileInDir.toPath(), StandardCopyOption.REPLACE_EXISTING)
             inputStream.close()
