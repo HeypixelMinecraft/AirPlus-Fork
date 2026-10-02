@@ -54,6 +54,8 @@ object BlurEffects {
         GL11.glDisable(GL11.GL_BLEND)
         GL11.glDisable(GL11.GL_ALPHA_TEST)
 
+        // 保存 scissor 状态：结束时按原样恢复，避免关闭调用方外层已开启的 scissor
+        val prevScissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST)
         glEnable(GL_SCISSOR_TEST)
         // Strictly limit scissor to blur area (no padding) to prevent blur from bleeding outside GUI bounds.
         // Texture sampling is not affected by scissor, so blur quality remains intact.
@@ -68,7 +70,8 @@ object BlurEffects {
         }
 
         restoreMatrix()
-        glDisable(GL_SCISSOR_TEST)
+
+        if (prevScissor) glEnable(GL_SCISSOR_TEST) else glDisable(GL_SCISSOR_TEST)
 
         // 恢复进入时的 GL 状态（blend / alpha / 纹理绑定 / 当前颜色）
         if (prevBlend) GL11.glEnable(GL11.GL_BLEND) else GL11.glDisable(GL11.GL_BLEND)

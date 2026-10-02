@@ -102,6 +102,10 @@ object Sound : Module("Sound", Category.CLIENT, canBeEnabled = false) {
         val wavPath = "airplus/sounds/Kill/${killSounds}.wav"
         val mp3Path = "airplus/sounds/Kill/${killSounds}.mp3"
 
+        
+        val wavPath = "airplus/sounds/Kill/${killSounds}.wav"
+        val mp3Path = "airplus/sounds/Kill/${killSounds}.mp3"
+        
         val wavExists = javaClass.getResourceAsStream("/assets/minecraft/$wavPath") != null
         val mp3Exists = javaClass.getResourceAsStream("/assets/minecraft/$mp3Path") != null
 

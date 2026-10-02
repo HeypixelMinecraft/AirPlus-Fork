@@ -12,9 +12,11 @@ import net.airplus.features.module.modules.combat.TickBase;
 import net.airplus.features.module.modules.exploit.AbortBreaking;
 import net.airplus.features.module.modules.exploit.MultiActions;
 import net.airplus.features.module.modules.render.BetterFPS;
+import net.airplus.features.module.modules.render.MotionBlur;
 import net.airplus.features.module.modules.world.FastPlace;
 import net.airplus.file.configs.models.ClientConfiguration;
 import net.airplus.injection.forge.SplashProgressLock;
+import net.airplus.injection.implementations.IMinecraft;
 import net.airplus.ui.client.GuiMainMenu;
 import net.airplus.utils.attack.CPSCounter;
 import net.airplus.utils.client.ClientUtils;
@@ -31,6 +33,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -38,6 +41,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -58,7 +62,7 @@ import static net.airplus.utils.client.MinecraftInstance.mc;
 
 @Mixin(Minecraft.class)
 @SideOnly(Side.CLIENT)
-public abstract class MixinMinecraft {
+public abstract class MixinMinecraft implements IMinecraft {
 
     @Shadow
     public GuiScreen currentScreen;
@@ -94,7 +98,19 @@ public abstract class MixinMinecraft {
     public GameSettings gameSettings;
 
     @Shadow
+    public EntityRenderer entityRenderer;
+
+    @Shadow
     public abstract void displayGuiScreen(GuiScreen guiScreenIn);
+
+    @Shadow
+    private void dispatchKeypresses() {
+    }
+
+    @Override
+    public void airplus$dispatchKeypresses() {
+        this.dispatchKeypresses();
+    }
 
     @Unique
     private Future<?> liquidBounce$preloadFuture;
@@ -181,6 +197,28 @@ public abstract class MixinMinecraft {
     @Inject(method = "runTick", at = @At("TAIL"))
     private void injectEndTickEvent(CallbackInfo ci) {
         EventManager.INSTANCE.call(TickEndEvent.INSTANCE);
+    }
+
+    @Inject(method = "runTick", at = @At("TAIL"))
+    private void injectMotionBlur(CallbackInfo ci) {
+        try {
+            if (mc.thePlayer != null && mc.theWorld != null && mc.thePlayer.ticksExisted > 10) {
+                final MotionBlur motionBlur = MotionBlur.INSTANCE;
+                if (motionBlur.handleEvents()) {
+                    if (entityRenderer.getShaderGroup() == null)
+                        entityRenderer.loadShader(new ResourceLocation("minecraft", "shaders/post/motion_blur.json"));
+                    final float uniform = 1F - Math.min(motionBlur.getBlurAmount() / 10F, 0.9f);
+                    if (entityRenderer.getShaderGroup() != null) {
+                        entityRenderer.getShaderGroup().listShaders.get(0).getShaderManager().getShaderUniform("Phosphor").set(uniform, 0F, 0F);
+                    }
+                } else {
+                    if (entityRenderer.isShaderActive())
+                        entityRenderer.stopUseShader();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Inject(method = "runTick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;joinPlayerCounter:I", ordinal = 0))

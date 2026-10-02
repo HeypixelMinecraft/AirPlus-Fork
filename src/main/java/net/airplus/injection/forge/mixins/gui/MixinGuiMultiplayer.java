@@ -12,6 +12,7 @@ import net.airplus.lang.LanguageKt;
 import net.airplus.ui.client.GuiClientFixes;
 import net.airplus.ui.client.altmanager.GuiAltManager;
 import net.airplus.ui.client.tools.GuiTools;
+import net.airplus.viaversion.viamcp.ViaMCP;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
@@ -44,6 +45,11 @@ public abstract class MixinGuiMultiplayer extends MixinGuiScreen {
         buttonList.add(bungeeCordSpoofButton = new GuiButton(998, 55 + increase, yPosition, 98, 20, "BungeeCord Spoof: " + (BungeeCordSpoof.INSTANCE.getEnabled() ? "On" : "Off")));
         buttonList.add(new GuiButton(996, width - 120, yPosition, 62, 20, LanguageKt.translationMenu("altManager")));
         buttonList.add(new GuiButton(999, width - 52, yPosition, 46, 20, "Tools"));
+
+        // Via protocol version slider
+        if (ViaMCP.INSTANCE != null && ViaMCP.INSTANCE.getAsyncVersionSlider() != null) {
+            buttonList.add(ViaMCP.INSTANCE.getAsyncVersionSlider());
+        }
     }
 
     @Inject(method = "actionPerformed", at = @At("HEAD"))

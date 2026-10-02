@@ -66,18 +66,12 @@ object Fonts : MinecraftInstance {
     lateinit var fontNeutonBold35: GameFontRenderer
     lateinit var fontNeutonBold40: GameFontRenderer
     lateinit var fontNeutonBold50: GameFontRenderer
-    lateinit var fontNeutonExtraBold35: GameFontRenderer
-    lateinit var fontNeutonExtraBold40: GameFontRenderer
-    lateinit var fontNeutonExtraBold50: GameFontRenderer
     lateinit var fontNeutonExtraLight35: GameFontRenderer
     lateinit var fontNeutonExtraLight40: GameFontRenderer
     lateinit var fontNeutonItalic35: GameFontRenderer
     lateinit var fontNeutonItalic40: GameFontRenderer
     lateinit var fontNeutonLight35: GameFontRenderer
     lateinit var fontNeutonLight40: GameFontRenderer
-    lateinit var fontNeutonRegular35: GameFontRenderer
-    lateinit var fontNeutonRegular40: GameFontRenderer
-    lateinit var fontNeutonRegular50: GameFontRenderer
     lateinit var fontNosifer35: GameFontRenderer
     lateinit var fontNosifer40: GameFontRenderer
     lateinit var fontNosifer50: GameFontRenderer
@@ -95,7 +89,25 @@ object Fonts : MinecraftInstance {
     lateinit var fontRise35: GameFontRenderer
     lateinit var fontRise40: GameFontRenderer
     lateinit var fontRise50: GameFontRenderer
-    lateinit var fontRiseIcon35: GameFontRenderer
+
+    // Hanabi HUD fonts (ported from Hanabi's FontManager)
+    // 注意：Hanabi 字体管线实际渲染尺寸 = 标称尺寸 x 0.5，而本客户端 = 标称尺寸 x 0.25，
+    // 因此从 Hanabi 移植的 UI 需要用 x2 尺寸的字体（fontUsans32/40、fontSessIcon48）才能还原原始大小。
+    lateinit var fontUsans15: GameFontRenderer
+    lateinit var fontUsans16: GameFontRenderer
+    lateinit var fontUsans20: GameFontRenderer
+    lateinit var fontUsans32: GameFontRenderer
+    lateinit var fontUsans40: GameFontRenderer
+    lateinit var fontUsans50: GameFontRenderer
+
+    // session.ttf（SessIcon）：图标字体。不进 FONT_REGISTRY 注册表，按需懒加载。
+    val fontSessIcon14: GameFontRenderer by lazy { sessIcon(14) }
+    val fontSessIcon20: GameFontRenderer by lazy { sessIcon(20) }
+    val fontSessIcon24: GameFontRenderer by lazy { sessIcon(24) }
+    val fontSessIcon48: GameFontRenderer by lazy { sessIcon(48) }
+
+    private fun sessIcon(size: Int): GameFontRenderer =
+        getFontOrDefault("SessIcon.ttf", size).asGameFontRenderer()
 
     @JvmStatic
     val font24: GameFontRenderer by lazy { fontRegular30 }
@@ -204,21 +216,6 @@ object Fonts : MinecraftInstance {
                 getFontOrDefault("Neuton-Bold.ttf", 50).asGameFontRenderer()
             )
 
-            fontNeutonExtraBold35 = register(
-                FontInfo(name = "Neuton ExtraBold", size = 35),
-                getFontOrDefault("Neuton-ExtraBold.ttf", 35).asGameFontRenderer()
-            )
-
-            fontNeutonExtraBold40 = register(
-                FontInfo(name = "Neuton ExtraBold", size = 40),
-                getFontOrDefault("Neuton-ExtraBold.ttf", 40).asGameFontRenderer()
-            )
-
-            fontNeutonExtraBold50 = register(
-                FontInfo(name = "Neuton ExtraBold", size = 50),
-                getFontOrDefault("Neuton-ExtraBold.ttf", 50).asGameFontRenderer()
-            )
-
             fontNeutonExtraLight35 = register(
                 FontInfo(name = "Neuton ExtraLight", size = 35),
                 getFontOrDefault("Neuton-ExtraLight.ttf", 35).asGameFontRenderer()
@@ -247,21 +244,6 @@ object Fonts : MinecraftInstance {
             fontNeutonLight40 = register(
                 FontInfo(name = "Neuton Light", size = 40),
                 getFontOrDefault("Neuton-Light.ttf", 40).asGameFontRenderer()
-            )
-
-            fontNeutonRegular35 = register(
-                FontInfo(name = "Neuton Regular", size = 35),
-                getFontOrDefault("Neuton-Regular.ttf", 35).asGameFontRenderer()
-            )
-
-            fontNeutonRegular40 = register(
-                FontInfo(name = "Neuton Regular", size = 40),
-                getFontOrDefault("Neuton-Regular.ttf", 40).asGameFontRenderer()
-            )
-
-            fontNeutonRegular50 = register(
-                FontInfo(name = "Neuton Regular", size = 50),
-                getFontOrDefault("Neuton-Regular.ttf", 50).asGameFontRenderer()
             )
 
             fontNosifer35 = register(
@@ -344,9 +326,34 @@ object Fonts : MinecraftInstance {
                 getFontOrDefault("SF-UI-Pro.ttf", 50).asGameFontRenderer()
             )
 
-            fontRiseIcon35 = register(
-                FontInfo(name = "Rise Icons", size = 35),
-                getFontOrDefault("Icon-1.ttf", 35).asGameFontRenderer()
+            fontUsans15 = register(
+                FontInfo(name = "Usans", size = 15),
+                getFontOrDefault("usans.otf", 15).asGameFontRenderer()
+            )
+
+            fontUsans16 = register(
+                FontInfo(name = "Usans", size = 16),
+                getFontOrDefault("usans.otf", 16).asGameFontRenderer()
+            )
+
+            fontUsans20 = register(
+                FontInfo(name = "Usans", size = 20),
+                getFontOrDefault("usans.otf", 20).asGameFontRenderer()
+            )
+
+            fontUsans32 = register(
+                FontInfo(name = "Usans", size = 32),
+                getFontOrDefault("usans.otf", 32).asGameFontRenderer()
+            )
+
+            fontUsans40 = register(
+                FontInfo(name = "Usans", size = 40),
+                getFontOrDefault("usans.otf", 40).asGameFontRenderer()
+            )
+
+            fontUsans50 = register(
+                FontInfo(name = "Usans", size = 50),
+                getFontOrDefault("usans.otf", 50).asGameFontRenderer()
             )
 
             loadCustomFonts()

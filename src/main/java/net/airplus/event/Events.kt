@@ -105,6 +105,12 @@ object PostSprintUpdateEvent : Event()
 class StrafeEvent(val strafe: Float, val forward: Float, val friction: Float) : CancellableEvent()
 
 /**
+ * Called in "moveEntity" before the movement math is applied.
+ * Cancelling freezes the player's movement for this tick.
+ */
+class MoveMathEvent : CancellableEvent()
+
+/**
  * Called when player moves
  *
  * @param x motion
@@ -244,6 +250,7 @@ internal val ALL_EVENT_CLASSES = arrayOf(
     TickEndEvent::class.java,
     JumpEvent::class.java,
     MoveEvent::class.java,
+    MoveMathEvent::class.java,
     ClientShutdownEvent::class.java,
     GameTickEvent::class.java,
     StepEvent::class.java,

@@ -295,6 +295,13 @@ object Island : Module("Island", Category.RENDER) {
     }
 
     private fun applyBlur(x: Float, y: Float, w: Float, h: Float) {
+        // 保存将被修改的 GL 状态，结束时精确恢复（而不是无条件覆盖）
+        val prevBlend = glIsEnabled(GL_BLEND)
+        val prevBlendSrc = glGetInteger(GL_BLEND_SRC)
+        val prevBlendDst = glGetInteger(GL_BLEND_DST)
+        val prevAlpha = glIsEnabled(GL_ALPHA_TEST)
+        val prevTexture = glIsEnabled(GL_TEXTURE_2D)
+
         when (blurMode) {
             "Gaussian" -> BlurEffects.blurArea(x, y, w, h, blurRadius, BlurEffects.BlurMode.GAUSSIAN)
             "Dual" -> BlurEffects.blurArea(x, y, w, h, blurRadius, BlurEffects.BlurMode.DUAL)
@@ -311,10 +318,12 @@ object Island : Module("Island", Category.RENDER) {
                 net.airplus.utils.render.shader.KawaseBlur.renderBlurScissor(kawaseIterations, kawaseOffset, px, py, pw, ph)
             }
         }
-        // Restore GL state after blur
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glEnable(GL_TEXTURE_2D)
+
+        // 精确恢复进入前的 GL 状态，避免 blend func / alpha test 泄漏到后续渲染
+        if (prevBlend) glEnable(GL_BLEND) else glDisable(GL_BLEND)
+        glBlendFunc(prevBlendSrc, prevBlendDst)
+        if (prevAlpha) glEnable(GL_ALPHA_TEST) else glDisable(GL_ALPHA_TEST)
+        if (prevTexture) glEnable(GL_TEXTURE_2D) else glDisable(GL_TEXTURE_2D)
     }
 
     private fun spring(current: Float, target: Float, velocity: Float): Pair<Float, Float> {
@@ -855,9 +864,9 @@ object Island : Module("Island", Category.RENDER) {
                     glEnable(GL_TEXTURE_2D)
                 }
 
-                EmbeddedStencil.dispose()
-
             } catch (e: Exception) {
+                // 异常路径先清除残留的 stencil 状态，避免回退绘制与后续渲染被 GL_EQUAL 遮罩
+                EmbeddedStencil.dispose()
                 if (ShadowCheck) {
                     val maxDist = shadowRadiusValue.toInt()
                     for (i in maxDist downTo 1) {
@@ -873,6 +882,9 @@ object Island : Module("Island", Category.RENDER) {
                 RenderUtils.drawRoundedRect(drawX, drawY, drawX + drawW, drawY + drawH, Color(0,0,0,BackgroundAlpha).rgb, currentRadius, islandCorners)
                 glEnable(GL_BLEND)
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            } finally {
+                // 无论成功还是异常都必须还原 stencil 状态（dispose 幂等，重复调用安全）
+                EmbeddedStencil.dispose()
             }
 
             when (renderMode) {
@@ -1994,12 +2006,14 @@ object Island : Module("Island", Category.RENDER) {
                 GlStateManager.pushMatrix()
                 applyBlur(bubbleX, bubbleY, AnimGlobalWidth, animBubbleHeight)
                 GlStateManager.popMatrix()
-                EmbeddedStencil.dispose()
             } catch (e: Exception) {
+            } finally {
+                // 异常时也必须还原 stencil 状态，避免空 catch 泄漏 GL_EQUAL
+                EmbeddedStencil.dispose()
             }
         }
 
-        RenderUtils.drawRoundedRect(bubbleX, bubbleY, bubbleX + AnimGlobalWidth, bubbleY + animBubbleHeight, 
+        RenderUtils.drawRoundedRect(bubbleX, bubbleY, bubbleX + AnimGlobalWidth, bubbleY + animBubbleHeight,
                        Color(0, 0, 0, alpha).rgb, 8F, RenderUtils.RoundedCorners.BOTTOM_ONLY)
         
         glEnable(GL_BLEND)
@@ -2163,8 +2177,10 @@ object Island : Module("Island", Category.RENDER) {
                 GlStateManager.pushMatrix()
                 applyBlur(bubbleX, bubbleY, animBubbleWidth, animBubbleHeight)
                 GlStateManager.popMatrix()
-                EmbeddedStencil.dispose()
             } catch (e: Exception) {
+            } finally {
+                // 异常时也必须还原 stencil 状态，避免空 catch 泄漏 GL_EQUAL
+                EmbeddedStencil.dispose()
             }
         }
 

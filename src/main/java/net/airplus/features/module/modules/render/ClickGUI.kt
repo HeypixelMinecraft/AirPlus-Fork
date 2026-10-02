@@ -18,7 +18,6 @@ import net.airplus.ui.client.clickgui.neverlose.NeverloseScreen
 import net.airplus.ui.client.clickgui.opai.OpaiScreen
 import net.airplus.ui.client.clickgui.rise.RiseClickGui
 import net.airplus.ui.client.clickgui.style.styles.LiquidBounceStyle
-import net.airplus.ui.client.clickgui.style.styles.MinimalStyle
 import net.airplus.ui.client.clickgui.style.styles.SlowlyStyle
 import net.airplus.utils.client.ClientThemesUtils
 import net.minecraft.network.play.server.S2EPacketCloseWindow
@@ -28,7 +27,7 @@ import java.awt.Color
 object ClickGUI : Module("ClickGUI", Category.CLIENT, Keyboard.KEY_RSHIFT, canBeEnabled = false) {
     private val style by choices(
         "Style",
-        arrayOf("LiquidBounce", "Slowly", "Minimal", "Neverlose", "Augustus", "Opai", "Astolfo", "MoonLight", "Rise", "Flat"),
+        arrayOf("LiquidBounce", "Slowly", "Neverlose", "Augustus", "Opai", "Astolfo", "MoonLight", "Rise", "Flat"),
         "LiquidBounce"
     ).onChanged {
         updateStyle()
@@ -134,7 +133,6 @@ object ClickGUI : Module("ClickGUI", Category.CLIENT, Keyboard.KEY_RSHIFT, canBe
         clickGui.style = when (style) {
             "LiquidBounce" -> LiquidBounceStyle
             "Slowly" -> SlowlyStyle
-            "Minimal" -> MinimalStyle
             else -> return
         }
     }

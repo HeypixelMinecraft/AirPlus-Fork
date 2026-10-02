@@ -62,20 +62,34 @@ object HudBlur : MinecraftInstance {
 
             "InternalBlur" -> {
                 EmbeddedStencil.write(false)
-                drawMask()
-                EmbeddedStencil.erase(true)
-                InternalBlurShader.blurArea(left, top, width, height, strength)
-                EmbeddedStencil.dispose()
+                try {
+                    // mask 绘制异常时也要恢复 colorMask/depthMask（erase 内部会还原）
+                    try {
+                        drawMask()
+                    } finally {
+                        EmbeddedStencil.erase(true)
+                    }
+                    InternalBlurShader.blurArea(left, top, width, height, strength)
+                } finally {
+                    // 异常路径同样还原 stencil 状态，避免残留 GL_EQUAL 导致后续渲染错乱
+                    EmbeddedStencil.dispose()
+                }
             }
 
             "Gaussian", "Dual" -> {
                 val blurMode = if (mode == "Gaussian") BlurEffects.BlurMode.GAUSSIAN else BlurEffects.BlurMode.DUAL
 
                 EmbeddedStencil.write(false)
-                drawMask()
-                EmbeddedStencil.erase(true)
-                BlurEffects.blurArea(left, top, width, height, strength, blurMode)
-                EmbeddedStencil.dispose()
+                try {
+                    try {
+                        drawMask()
+                    } finally {
+                        EmbeddedStencil.erase(true)
+                    }
+                    BlurEffects.blurArea(left, top, width, height, strength, blurMode)
+                } finally {
+                    EmbeddedStencil.dispose()
+                }
             }
 
             "Kawase" -> {
@@ -85,24 +99,29 @@ object HudBlur : MinecraftInstance {
                 val offset = (strength / iterations).toInt().coerceIn(1, 6)
 
                 EmbeddedStencil.write(false)
-                drawMask()
-                EmbeddedStencil.erase(true)
+                try {
+                    try {
+                        drawMask()
+                    } finally {
+                        EmbeddedStencil.erase(true)
+                    }
 
-                // KawaseBlur 内部 ShaderUtil.drawQuads 依赖当前 modelview，必须重置为单位阵
-                glMatrixMode(GL_MODELVIEW)
-                glPushMatrix()
-                glLoadIdentity()
-                KawaseBlur.renderBlurScissor(
-                    iterations,
-                    offset,
-                    (left * factor).toInt(),
-                    mc.displayHeight - (bottom * factor).toInt(),
-                    (width * factor).toInt(),
-                    (height * factor).toInt()
-                )
-                glPopMatrix()
-
-                EmbeddedStencil.dispose()
+                    // KawaseBlur 内部 ShaderUtil.drawQuads 依赖当前 modelview，必须重置为单位阵
+                    glMatrixMode(GL_MODELVIEW)
+                    glPushMatrix()
+                    glLoadIdentity()
+                    KawaseBlur.renderBlurScissor(
+                        iterations,
+                        offset,
+                        (left * factor).toInt(),
+                        mc.displayHeight - (bottom * factor).toInt(),
+                        (width * factor).toInt(),
+                        (height * factor).toInt()
+                    )
+                    glPopMatrix()
+                } finally {
+                    EmbeddedStencil.dispose()
+                }
             }
         }
     }

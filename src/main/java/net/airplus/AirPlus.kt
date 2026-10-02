@@ -22,6 +22,7 @@ import net.airplus.features.special.BungeeCordSpoof
 import net.airplus.features.special.ClientFixes
 import net.airplus.features.special.ClientRichPresence
 import net.airplus.features.special.ClientRichPresence.showRPCValue
+import net.airplus.utils.inputfix.InputFixInit
 import net.airplus.file.FileManager
 import net.airplus.file.FileManager.loadAllConfigs
 import net.airplus.file.FileManager.saveAllConfigs
@@ -58,6 +59,7 @@ import net.airplus.utils.render.shader.Background
 import net.airplus.utils.rotation.RotationUtils
 import net.airplus.utils.timing.TickedActions
 import net.airplus.utils.timing.WaitTickUtils
+import net.airplus.viaversion.viamcp.ViaMCP
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
 import javax.swing.UIManager
@@ -163,6 +165,17 @@ object AirPlus {
         LOGGER.info("Starting $CLIENT_NAME $clientVersionText $clientCommit, by $CLIENT_AUTHOR")
 
         try {
+            // Initialize ViaMCP (protocol translation) and its version slider
+            runCatching {
+                ViaMCP.create()
+                ViaMCP.INSTANCE.initAsyncSlider(160, 8, 110, 20)
+            }.onFailure {
+                LOGGER.error("Failed to initialize ViaMCP.", it)
+            }
+
+            // Initialize the Chinese input fix (port of AirClient's InputFix)
+            InputFixInit.init()
+
             // Load client fonts
             Fonts.loadFonts()
 

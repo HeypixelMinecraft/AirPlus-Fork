@@ -29,7 +29,8 @@ object HUD : MinecraftInstance {
     private val ALL_ELEMENT_CLASSES = arrayOf(
         Armor::class.java,
         Arraylist::class.java,
-        Effects::class.java,
+        Potions::class.java,
+        Logo::class.java,
         Image::class.java,
         Inventory::class.java,
         Model::class.java,
@@ -41,6 +42,7 @@ object HUD : MinecraftInstance {
         Target2::class.java,
         MusicLyric::class.java,
         Radar::class.java,
+        SessionInfo::class.java,
         SpeedGraph::class.java,
         Cooldown::class.java,
         Taco::class.java,
@@ -61,7 +63,8 @@ object HUD : MinecraftInstance {
         addElement(Arraylist())
         addElement(ScoreboardElement())
         addElement(Armor())
-        addElement(Effects())
+        addElement(Potions())
+        addElement(Logo())
         addElement(Notifications())
         addElement(Keystrokes())
     }

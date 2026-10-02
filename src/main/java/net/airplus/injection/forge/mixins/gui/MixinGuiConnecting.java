@@ -5,6 +5,7 @@
  */
 package net.airplus.injection.forge.mixins.gui;
 
+import net.airplus.ui.client.hud.element.elements.SessionInfo;
 import net.airplus.ui.font.Fonts;
 import net.airplus.utils.client.ServerUtils;
 import net.airplus.utils.render.RenderUtils;
@@ -27,6 +28,8 @@ public abstract class MixinGuiConnecting extends GuiScreen {
     @Inject(method = "connect", at = @At("HEAD"))
     private void headConnect(final String ip, final int port, CallbackInfo callbackInfo) {
         ServerUtils.INSTANCE.setServerData(new ServerData("", ip + ":" + port, false));
+        // Hanabi: reset the SessionInfo play timer on every server connect (HudWindowManager.startTime)
+        SessionInfo.setStartTime(System.currentTimeMillis());
     }
 
     /**

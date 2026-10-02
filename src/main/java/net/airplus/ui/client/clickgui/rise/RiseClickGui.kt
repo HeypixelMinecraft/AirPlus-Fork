@@ -315,7 +315,7 @@ class RiseClickGui : GuiScreen() {
                 val pillW = Fonts.fontRise35.getStringWidth(label) + 28f
                 RoundedUtil.drawRound(x + 6f, cy - 5f, pillW.coerceAtMost(sidebarW - 12f), 20f, 5f, Color(255, 255, 255, 18))
             }
-            Fonts.fontRiseIcon35.drawString(icon, x + 10f, cy + 1f, if (selected) Color.WHITE.rgb else Color(255, 255, 255, 200).rgb)
+            Fonts.fontSessIcon48.drawString(icon, x + 10f, cy + 1f, if (selected) Color.WHITE.rgb else Color(255, 255, 255, 200).rgb)
             Fonts.fontRise35.drawString(label, x + 28f, cy + 1f, if (selected) Color.WHITE.rgb else Color(255, 255, 255, 200).rgb)
             cy += 23f
         }
@@ -331,7 +331,7 @@ class RiseClickGui : GuiScreen() {
         if (settingsHovered && !settingsSelected) {
             RoundedUtil.drawRound(x + 6f, cy - 5f, (Fonts.fontRise35.getStringWidth("Settings") + 28f).coerceAtMost(sidebarW - 12f), 20f, 5f, Color(255, 255, 255, 18))
         }
-        Fonts.fontRiseIcon35.drawString("e", x + 10f, cy + 1f, if (settingsSelected) Color.WHITE.rgb else Color(255, 255, 255, 200).rgb)
+        Fonts.fontSessIcon48.drawString("K", x + 10f, cy + 1f, if (settingsSelected) Color.WHITE.rgb else Color(255, 255, 255, 200).rgb)
         Fonts.fontRise35.drawString("Settings", x + 28f, cy + 1f, if (settingsSelected) Color.WHITE.rgb else Color(255, 255, 255, 200).rgb)
     }
 
@@ -940,15 +940,16 @@ class RiseClickGui : GuiScreen() {
     private fun isHovered(hx: Float, hy: Float, hw: Float, hh: Float, mouseX: Int, mouseY: Int) =
         mouseX >= hx && mouseX <= hx + hw && mouseY >= hy && mouseY <= hy + hh
 
+    // 图标使用 SessIcon 字体（session.ttf）：F剑 C跑步 G单人 A鼠标 L地球 J拼图 K齿轮 H双人
     private fun Category.riseIcon() = when (this) {
-        Category.COMBAT -> "a"
-        Category.MOVEMENT -> "b"
-        Category.PLAYER -> "c"
-        Category.RENDER -> "g"
-        Category.WORLD -> "g"
-        Category.MISC -> "e"
-        Category.EXPLOIT -> "a"
-        Category.CLIENT -> "f"
+        Category.COMBAT -> "F"
+        Category.MOVEMENT -> "C"
+        Category.PLAYER -> "G"
+        Category.RENDER -> "A"
+        Category.WORLD -> "L"
+        Category.MISC -> "J"
+        Category.EXPLOIT -> "F"
+        Category.CLIENT -> "H"
     }
 
     private companion object {

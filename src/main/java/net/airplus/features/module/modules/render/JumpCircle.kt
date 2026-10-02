@@ -97,11 +97,9 @@ object JumpCircle : Module("JumpCircle", Category.RENDER, gameDetecting = false)
             }
             else -> 0f
         }
-        // 保存渲染前的混合/光照状态，渲染结束后精确还原。
-        // 之前无条件 disableBlend + enableLighting 会污染后续渲染状态：
-        // 开启固定管线光照后，之后绘制的半透明元素（如 Scaffold 的标记、第三人称下的界面）
-        // 颜色会被环境光衰减而变灰。
-        val blendEnabled = glIsEnabled(GL_BLEND)
+        // 光照用 save/restore：无条件开启会让后续绘制的半透明元素（如 Scaffold 的标记）被环境光衰减而变灰。
+        // blend 必须无条件关闭：Render3DEvent 触发点在 renderHand 之前，半透明地形渲染遗留的开启状态
+        // 若被还原回去，第一人称手部物品会被混合渲染而呈半透明（与 AirClient 原版一致）。
         val lightingEnabled = glIsEnabled(GL_LIGHTING)
         setupDrawCircles {
             // 复用缓冲：先渲染所有圆，再一次性重建列表，避免每帧分配新的 ArrayList
@@ -134,7 +132,7 @@ object JumpCircle : Module("JumpCircle", Category.RENDER, gameDetecting = false)
         }
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.depthMask(true)
-        if (blendEnabled) GlStateManager.enableBlend() else GlStateManager.disableBlend()
+        GlStateManager.disableBlend()
         if (lightingEnabled) GlStateManager.enableLighting() else GlStateManager.disableLighting()
     }
 
