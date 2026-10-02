@@ -99,8 +99,6 @@ object Sound : Module("Sound", Category.CLIENT, canBeEnabled = false) {
         }
         lastKillSoundTime = currentTime
 
-        val wavPath = "airplus/sounds/Kill/${killSounds}.wav"
-        val mp3Path = "airplus/sounds/Kill/${killSounds}.mp3"
 
         
         val wavPath = "airplus/sounds/Kill/${killSounds}.wav"
