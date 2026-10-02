@@ -10,6 +10,7 @@ import net.airplus.event.*
 import net.airplus.features.module.Category
 import net.airplus.features.module.Module
 import net.airplus.features.module.modules.combat.Backtrack.runWithSimulatedPosition
+import net.airplus.features.module.modules.misc.Teams
 import net.airplus.features.module.modules.player.Blink
 import net.airplus.features.module.modules.world.Fucker
 import net.airplus.features.module.modules.world.Nuker
@@ -136,39 +137,40 @@ object KillAura : Module("KillAura", Category.COMBAT, Keyboard.KEY_R) {
     private val onDestroyBlock by boolean("OnDestroyBlock", false)
 
     // AutoBlock
-    val autoBlock by choices("AutoBlock", arrayOf("Off", "Packet", "Fake"), "Packet")
+    val autoBlock by choices("AutoBlock", arrayOf("Off", "Packet", "Fake", "BlockOnNoHit"), "Packet")
+    private val blockOnNoHitRange by float("BlockOnNoHitRange", 6f, 1f..16f) { autoBlock == "BlockOnNoHit" }
     private val blockMaxRange by float("BlockMaxRange", 3f, 0f..8f) { autoBlock == "Packet" }
     private val unblockMode by choices(
         "UnblockMode", arrayOf("Stop", "Switch", "Empty"), "Stop"
     ) { autoBlock == "Packet" }
-    private val releaseAutoBlock by boolean("ReleaseAutoBlock", true) { autoBlock !in arrayOf("Off", "Fake") }
+    private val releaseAutoBlock by boolean("ReleaseAutoBlock", true) { autoBlock !in arrayOf("Off", "Fake", "BlockOnNoHit") }
     val forceBlockRender by boolean("ForceBlockRender", true) {
         autoBlock !in arrayOf(
-            "Off", "Fake"
+            "Off", "Fake", "BlockOnNoHit"
         ) && releaseAutoBlock
     }
     private val ignoreTickRule by boolean("IgnoreTickRule", false) {
         autoBlock !in arrayOf(
-            "Off", "Fake"
+            "Off", "Fake", "BlockOnNoHit"
         ) && releaseAutoBlock
     }
     private val blockRate by int("BlockRate", 100, 1..100) { autoBlock !in arrayOf("Off", "Fake") && releaseAutoBlock }
 
     private val uncpAutoBlock by boolean("UpdatedNCPAutoBlock", false) {
         autoBlock !in arrayOf(
-            "Off", "Fake"
+            "Off", "Fake", "BlockOnNoHit"
         ) && !releaseAutoBlock
     }
 
-    private val switchStartBlock by boolean("SwitchStartBlock", false) { autoBlock !in arrayOf("Off", "Fake") }
+    private val switchStartBlock by boolean("SwitchStartBlock", false) { autoBlock !in arrayOf("Off", "Fake", "BlockOnNoHit") }
 
-    private val interactAutoBlock by boolean("InteractAutoBlock", true) { autoBlock !in arrayOf("Off", "Fake") }
+    private val interactAutoBlock by boolean("InteractAutoBlock", true) { autoBlock !in arrayOf("Off", "Fake", "BlockOnNoHit") }
 
-    val blinkAutoBlock by boolean("BlinkAutoBlock", false) { autoBlock !in arrayOf("Off", "Fake") }
+    val blinkAutoBlock by boolean("BlinkAutoBlock", false) { autoBlock !in arrayOf("Off", "Fake", "BlockOnNoHit") }
 
     private val blinkBlockTicks by int("BlinkBlockTicks", 3, 2..5) {
         autoBlock !in arrayOf(
-            "Off", "Fake"
+            "Off", "Fake", "BlockOnNoHit"
         ) && blinkAutoBlock
     }
 
@@ -453,6 +455,27 @@ object KillAura : Module("KillAura", Category.COMBAT, Keyboard.KEY_R) {
 
         if (simulateCooldown && getAttackCooldownProgress() < 1f) {
             return@handler
+        }
+
+        // BlockOnNoHit: only hold the block while there is nothing to attack,
+        // release it as soon as we are attacking so hits are not interfered
+        if (autoBlock == "BlockOnNoHit") {
+            if (target == null) {
+                // Only block while an enemy is inside BlockOnNoHitRange
+                if (hasEnemyInBlockOnNoHitRange()) {
+                    if (!blockStatus && player.heldItem?.item is ItemSword) {
+                        startBlocking(player, false)
+                    }
+                } else if (blockStatus) {
+                    stopBlocking(true)
+                }
+
+                return@handler
+            }
+
+            if (blockStatus) {
+                stopBlocking(true)
+            }
         }
 
         if (target == null && !blockStopInDead) {
@@ -827,6 +850,20 @@ object KillAura : Module("KillAura", Category.COMBAT, Keyboard.KEY_R) {
     }
 
     /**
+     * Check if there is any enemy (player) inside BlockOnNoHitRange
+     */
+    private fun hasEnemyInBlockOnNoHitRange(): Boolean {
+        val player = mc.thePlayer ?: return false
+        val world = mc.theWorld ?: return false
+
+        return world.loadedEntityList.any {
+            it is EntityPlayer && it != player && !it.isDead &&
+                    player.getDistanceToEntity(it) <= blockOnNoHitRange &&
+                    !(Teams.handleEvents() && Teams.isInYourTeam(it))
+        }
+    }
+
+    /**
      * Attack [entity]
      */
     private fun attackEntity(entity: EntityLivingBase, isLastClick: Boolean) {
@@ -840,6 +877,10 @@ object KillAura : Module("KillAura", Category.COMBAT, Keyboard.KEY_R) {
             if (!ignoreTickRule || autoBlock == "Off") {
                 return
             }
+        } else if (autoBlock == "BlockOnNoHit" && blockStatus) {
+            // BlockOnNoHit only holds the block when there is nothing to attack,
+            // release it right before attacking without skipping the attack itself
+            stopBlocking(true)
         }
 
         // The function is only called when we are facing an entity
@@ -862,7 +903,7 @@ object KillAura : Module("KillAura", Category.COMBAT, Keyboard.KEY_R) {
         }
 
         // Start blocking after attack
-        if (autoBlock != "Off" && (thePlayer.isBlocking || canBlock) && (!blinkAutoBlock && isLastClick || blinkAutoBlock && (!blinked || !BlinkUtils.isBlinking))) {
+        if (autoBlock !in arrayOf("Off", "BlockOnNoHit") && (thePlayer.isBlocking || canBlock) && (!blinkAutoBlock && isLastClick || blinkAutoBlock && (!blinked || !BlinkUtils.isBlinking))) {
             startBlocking(entity, interactAutoBlock, autoBlock == "Fake")
         }
 

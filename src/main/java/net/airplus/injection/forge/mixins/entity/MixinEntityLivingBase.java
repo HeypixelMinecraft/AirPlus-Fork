@@ -5,6 +5,7 @@
  */
 package net.airplus.injection.forge.mixins.entity;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import net.airplus.event.EventManager;
 import net.airplus.event.EventState;
 import net.airplus.event.JumpEvent;
@@ -20,6 +21,7 @@ import net.airplus.utils.rotation.Rotation;
 import net.airplus.utils.rotation.RotationSettings;
 import net.airplus.utils.rotation.RotationUtils;
 import net.airplus.utils.extensions.MathExtensionsKt;
+import net.airplus.viaversion.vialoadingbase.ViaLoadingBase;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -177,5 +179,14 @@ public abstract class MixinEntityLivingBase extends MixinEntity {
         Animations module = Animations.INSTANCE;
 
         return module.handleEvents() ? (2 + (20 - module.getSwingSpeed())) : constant;
+    }
+
+    /**
+     * PacketFix：跨版本（目标协议 >= 1.12.2）时运动归零阈值由 0.005 改为 0.003，
+     * 与 1.12.2 服务器判定保持一致。
+     */
+    @ModifyConstant(method = "onLivingUpdate", constant = @Constant(doubleValue = 0.005D), allow = 3)
+    private double packetFix$minimumMotion(double constant) {
+        return ViaLoadingBase.getInstance().getTargetVersion().isNewerThanOrEqualTo(ProtocolVersion.v1_12_2) ? 0.003D : constant;
     }
 }

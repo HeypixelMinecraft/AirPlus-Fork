@@ -253,48 +253,55 @@ object Island : Module("Island", Category.RENDER) {
 
     private fun getLogoResource(): ResourceLocation {
         return when (logoIcon) {
-            "Default" -> ResourceLocation("airclient/watermark_images/logo_icon.png")
-            "A" -> ResourceLocation("airclient/watermark_images/A.png")
-            "Diamond" -> ResourceLocation("airclient/watermark_images/Diamond.png")
-            "Radioactive" -> ResourceLocation("airclient/watermark_images/Radioactive.png")
-            "Start" -> ResourceLocation("airclient/watermark_images/start.png")
-            "Start2" -> ResourceLocation("airclient/watermark_images/start2.png")
-            "Earth" -> ResourceLocation("airclient/watermark_images/earth.png")
-            else -> ResourceLocation("airclient/watermark_images/logo_icon.png")
+            "Default" -> ResourceLocation("airplus/watermark_images/logo_icon.png")
+            "A" -> ResourceLocation("airplus/watermark_images/A.png")
+            "Diamond" -> ResourceLocation("airplus/watermark_images/Diamond.png")
+            "Radioactive" -> ResourceLocation("airplus/watermark_images/Radioactive.png")
+            "Start" -> ResourceLocation("airplus/watermark_images/start.png")
+            "Start2" -> ResourceLocation("airplus/watermark_images/start2.png")
+            "Earth" -> ResourceLocation("airplus/watermark_images/earth.png")
+            else -> ResourceLocation("airplus/watermark_images/logo_icon.png")
         }
     }
 
     private fun getPingResource(): ResourceLocation {
         return when (pingIcon) {
-            "Default" -> ResourceLocation("airclient/watermark_images/ms.png")
-            "Ping2" -> ResourceLocation("airclient/watermark_images/ping2.png")
-            "Ping3" -> ResourceLocation("airclient/watermark_images/ping3.png")
-            "Ping4" -> ResourceLocation("airclient/watermark_images/ping4.png")
-            "Ping5" -> ResourceLocation("airclient/watermark_images/ping5.png")
-            else -> ResourceLocation("airclient/watermark_images/ms.png")
+            "Default" -> ResourceLocation("airplus/watermark_images/ms.png")
+            "Ping2" -> ResourceLocation("airplus/watermark_images/ping2.png")
+            "Ping3" -> ResourceLocation("airplus/watermark_images/ping3.png")
+            "Ping4" -> ResourceLocation("airplus/watermark_images/ping4.png")
+            "Ping5" -> ResourceLocation("airplus/watermark_images/ping5.png")
+            else -> ResourceLocation("airplus/watermark_images/ms.png")
         }
     }
 
     private fun getGappleResource(): ResourceLocation {
         return when (gappleIcon) {
-            "Default" -> ResourceLocation("airclient/watermark_images/apple.png")
-            "Heart" -> ResourceLocation("airclient/watermark_images/heart.png")
-            "Heart2" -> ResourceLocation("airclient/watermark_images/heart2.png")
-            else -> ResourceLocation("airclient/watermark_images/apple.png")
+            "Default" -> ResourceLocation("airplus/watermark_images/apple.png")
+            "Heart" -> ResourceLocation("airplus/watermark_images/heart.png")
+            "Heart2" -> ResourceLocation("airplus/watermark_images/heart2.png")
+            else -> ResourceLocation("airplus/watermark_images/apple.png")
         }
     }
 
     private fun getUserResource(): ResourceLocation {
         return when (userIcon) {
-            "Default" -> ResourceLocation("airclient/watermark_images/user.png")
-            "User2" -> ResourceLocation("airclient/watermark_images/user2.png")
-            "User3" -> ResourceLocation("airclient/watermark_images/user3.png")
-            "User4" -> ResourceLocation("airclient/watermark_images/user4.png")
-            else -> ResourceLocation("airclient/watermark_images/user.png")
+            "Default" -> ResourceLocation("airplus/watermark_images/user.png")
+            "User2" -> ResourceLocation("airplus/watermark_images/user2.png")
+            "User3" -> ResourceLocation("airplus/watermark_images/user3.png")
+            "User4" -> ResourceLocation("airplus/watermark_images/user4.png")
+            else -> ResourceLocation("airplus/watermark_images/user.png")
         }
     }
 
     private fun applyBlur(x: Float, y: Float, w: Float, h: Float) {
+        // 保存将被修改的 GL 状态，结束时精确恢复（而不是无条件覆盖）
+        val prevBlend = glIsEnabled(GL_BLEND)
+        val prevBlendSrc = glGetInteger(GL_BLEND_SRC)
+        val prevBlendDst = glGetInteger(GL_BLEND_DST)
+        val prevAlpha = glIsEnabled(GL_ALPHA_TEST)
+        val prevTexture = glIsEnabled(GL_TEXTURE_2D)
+
         when (blurMode) {
             "Gaussian" -> BlurEffects.blurArea(x, y, w, h, blurRadius, BlurEffects.BlurMode.GAUSSIAN)
             "Dual" -> BlurEffects.blurArea(x, y, w, h, blurRadius, BlurEffects.BlurMode.DUAL)
@@ -311,10 +318,12 @@ object Island : Module("Island", Category.RENDER) {
                 net.airplus.utils.render.shader.KawaseBlur.renderBlurScissor(kawaseIterations, kawaseOffset, px, py, pw, ph)
             }
         }
-        // Restore GL state after blur
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glEnable(GL_TEXTURE_2D)
+
+        // 精确恢复进入前的 GL 状态，避免 blend func / alpha test 泄漏到后续渲染
+        if (prevBlend) glEnable(GL_BLEND) else glDisable(GL_BLEND)
+        glBlendFunc(prevBlendSrc, prevBlendDst)
+        if (prevAlpha) glEnable(GL_ALPHA_TEST) else glDisable(GL_ALPHA_TEST)
+        if (prevTexture) glEnable(GL_TEXTURE_2D) else glDisable(GL_TEXTURE_2D)
     }
 
     private fun spring(current: Float, target: Float, velocity: Float): Pair<Float, Float> {
@@ -855,9 +864,9 @@ object Island : Module("Island", Category.RENDER) {
                     glEnable(GL_TEXTURE_2D)
                 }
 
-                EmbeddedStencil.dispose()
-
             } catch (e: Exception) {
+                // 异常路径先清除残留的 stencil 状态，避免回退绘制与后续渲染被 GL_EQUAL 遮罩
+                EmbeddedStencil.dispose()
                 if (ShadowCheck) {
                     val maxDist = shadowRadiusValue.toInt()
                     for (i in maxDist downTo 1) {
@@ -873,6 +882,9 @@ object Island : Module("Island", Category.RENDER) {
                 RenderUtils.drawRoundedRect(drawX, drawY, drawX + drawW, drawY + drawH, Color(0,0,0,BackgroundAlpha).rgb, currentRadius, islandCorners)
                 glEnable(GL_BLEND)
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            } finally {
+                // 无论成功还是异常都必须还原 stencil 状态（dispose 幂等，重复调用安全）
+                EmbeddedStencil.dispose()
             }
 
             when (renderMode) {
@@ -950,7 +962,7 @@ object Island : Module("Island", Category.RENDER) {
         val themeColor = Color(breakProgressTheme.red, breakProgressTheme.green, breakProgressTheme.blue, 200)
         drawRoundedRect(iconBgX, iconBgY, iconBgX + iconSize, iconBgY + iconSize, themeColor.rgb, cornerRadius - 1)
         val bedImgSize = 24
-        drawImage(ResourceLocation("airclient/watermark_images/bed.png"), (iconBgX + (iconSize - bedImgSize) / 2).toInt(), (iconBgY + (iconSize - bedImgSize) / 2 + 1).toInt(), bedImgSize, bedImgSize, Color.WHITE)
+        drawImage(ResourceLocation("airplus/watermark_images/bed.png"), (iconBgX + (iconSize - bedImgSize) / 2).toInt(), (iconBgY + (iconSize - bedImgSize) / 2 + 1).toInt(), bedImgSize, bedImgSize, Color.WHITE)
 
         val textX = iconBgX + iconSize + 8F
         val titleY = y + padding + 2F
@@ -1173,7 +1185,7 @@ object Island : Module("Island", Category.RENDER) {
         val themeColor = Color(ScaffoldTheme.red, ScaffoldTheme.green, ScaffoldTheme.blue, 200)
         drawRoundedRect(iconBgX, iconBgY, iconBgX + iconSize, iconBgY + iconSize, themeColor.rgb, cornerRadius - 1)
         val blockImgSize = 24
-        drawImage(ResourceLocation("airclient/watermark_images/block.png"), (iconBgX + (iconSize - blockImgSize) / 2).toInt(), (iconBgY + (iconSize - blockImgSize) / 2 + 1).toInt(), blockImgSize, blockImgSize, Color.WHITE)
+        drawImage(ResourceLocation("airplus/watermark_images/block.png"), (iconBgX + (iconSize - blockImgSize) / 2).toInt(), (iconBgY + (iconSize - blockImgSize) / 2 + 1).toInt(), blockImgSize, blockImgSize, Color.WHITE)
 
         val textX = iconBgX + iconSize + 8F
         val titleY = y + padding + 2F
@@ -1272,7 +1284,7 @@ object Island : Module("Island", Category.RENDER) {
         val themeColor = Color(ScaffoldTheme.red, ScaffoldTheme.green, ScaffoldTheme.blue, 200)
         drawRoundedRect(iconBgX, iconBgY, iconBgX + iconSize, iconBgY + iconSize, themeColor.rgb, 4F)
         val blockImgSize = 14
-        drawImage(ResourceLocation("airclient/watermark_images/block.png"), (iconBgX + (iconSize - blockImgSize) / 2).toInt(), (iconBgY + (iconSize - blockImgSize) / 2 + 1).toInt(), blockImgSize, blockImgSize, Color.WHITE)
+        drawImage(ResourceLocation("airplus/watermark_images/block.png"), (iconBgX + (iconSize - blockImgSize) / 2).toInt(), (iconBgY + (iconSize - blockImgSize) / 2 + 1).toInt(), blockImgSize, blockImgSize, Color.WHITE)
 
         val textX = iconBgX + iconSize + 6F
         val bpsText = String.format("%.1f", if(AnimatedBps < 0.01) 0.0 else AnimatedBps)
@@ -1585,7 +1597,7 @@ object Island : Module("Island", Category.RENDER) {
                     val iconBgY = y + (h - iconBgSize) / 2
                     drawRoundedRect(iconBgX, iconBgY, iconBgX + iconBgSize, iconBgY + iconBgSize, 
                         Color(40, 40, 45, (200 * animBubbleAlpha).toInt()).rgb, 3F)
-                    drawImage(ResourceLocation("airclient/watermark_images/music.png"), 
+                    drawImage(ResourceLocation("airplus/watermark_images/music.png"), 
                         (iconBgX + 1).toInt(), (iconBgY + 1).toInt(), 8, 8, 
                         Color(255, 255, 255, (255 * animBubbleAlpha).toInt()))
                     
@@ -1628,7 +1640,7 @@ object Island : Module("Island", Category.RENDER) {
         cx += info.serverIpWidth + info.dotSpacing
         drawCenteredDot(cx - 1, textBaseY)
         cx += 3F
-        drawImage(ResourceLocation("airclient/watermark_images/fps.png"), cx, iconY, 15, 15, Color.WHITE)
+        drawImage(ResourceLocation("airplus/watermark_images/fps.png"), cx, iconY, 15, 15, Color.WHITE)
         cx += 15F + info.elementSpacing
         Fonts.fontSemibold40.drawString(info.fpsStr, cx, textBaseY, Color.WHITE.rgb)
     }
@@ -1743,7 +1755,7 @@ object Island : Module("Island", Category.RENDER) {
         AnimGlobalX = nX
         ShowShadow(x, y, wCalc, h)
         drawRoundedBorderRect(x, y, x+wCalc, y+h, 0.5F, Color(10,10,10,BackgroundAlpha).rgb, Color(30,30,30,BackgroundAlpha).rgb, h/2)
-        drawImage(ResourceLocation("airclient/logo_icon.png"), (x+5).toInt(), (y + (h-18)/2).toInt(), 18, 18, colorRGB)
+        drawImage(ResourceLocation("airplus/logo_icon.png"), (x+5).toInt(), (y + (h-18)/2).toInt(), 18, 18, colorRGB)
         Fonts.fontSemibold40.drawString(mainText, x + 28, y + (h-9)/2+1, colorRGB.rgb)
         Fonts.fontSemibold40.drawString(text, x + 28 + Fonts.fontSemibold40.getStringWidth(mainText), y + (h-9)/2+1, -1)
     }
@@ -1994,12 +2006,14 @@ object Island : Module("Island", Category.RENDER) {
                 GlStateManager.pushMatrix()
                 applyBlur(bubbleX, bubbleY, AnimGlobalWidth, animBubbleHeight)
                 GlStateManager.popMatrix()
-                EmbeddedStencil.dispose()
             } catch (e: Exception) {
+            } finally {
+                // 异常时也必须还原 stencil 状态，避免空 catch 泄漏 GL_EQUAL
+                EmbeddedStencil.dispose()
             }
         }
 
-        RenderUtils.drawRoundedRect(bubbleX, bubbleY, bubbleX + AnimGlobalWidth, bubbleY + animBubbleHeight, 
+        RenderUtils.drawRoundedRect(bubbleX, bubbleY, bubbleX + AnimGlobalWidth, bubbleY + animBubbleHeight,
                        Color(0, 0, 0, alpha).rgb, 8F, RenderUtils.RoundedCorners.BOTTOM_ONLY)
         
         glEnable(GL_BLEND)
@@ -2163,8 +2177,10 @@ object Island : Module("Island", Category.RENDER) {
                 GlStateManager.pushMatrix()
                 applyBlur(bubbleX, bubbleY, animBubbleWidth, animBubbleHeight)
                 GlStateManager.popMatrix()
-                EmbeddedStencil.dispose()
             } catch (e: Exception) {
+            } finally {
+                // 异常时也必须还原 stencil 状态，避免空 catch 泄漏 GL_EQUAL
+                EmbeddedStencil.dispose()
             }
         }
 
@@ -2589,7 +2605,7 @@ object Island : Module("Island", Category.RENDER) {
         val iconSz = (coverSize * 0.6f).toInt()
         val iconOffsetX = coverX + (coverSize - iconSz) / 2f
         val iconOffsetY = coverY + (coverSize - iconSz) / 2f
-        drawImage(ResourceLocation("airclient/watermark_images/music.png"),
+        drawImage(ResourceLocation("airplus/watermark_images/music.png"),
             iconOffsetX.toInt(), iconOffsetY.toInt(), iconSz, iconSz, Color.WHITE)
 
         // --- Text area (right of cover) ---

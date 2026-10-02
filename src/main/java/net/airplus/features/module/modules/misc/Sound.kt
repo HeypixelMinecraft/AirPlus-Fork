@@ -20,23 +20,23 @@ object Sound : Module("Sound", Category.CLIENT, canBeEnabled = false) {
 
     val enableSounds by choices(
         "Enable",
-        getMP3S("assets/minecraft/airclient/sounds/Enable").toTypedArray().takeIf { it.isNotEmpty() } 
+        (getWAVS("assets/minecraft/airplus/sounds/Enable") + getMP3S("assets/minecraft/airplus/sounds/Enable")).toTypedArray().takeIf { it.isNotEmpty() }
             ?: arrayOf("None"),
-        getMP3S("assets/minecraft/airclient/sounds/Enable").firstOrNull() ?: "None"
+        getMP3S("assets/minecraft/airplus/sounds/Enable").firstOrNull() ?: "None"
     )
 
     val disableSounds by choices(
         "Disable",
-        getMP3S("assets/minecraft/airclient/sounds/Disable").toTypedArray().takeIf { it.isNotEmpty() }
+        (getWAVS("assets/minecraft/airplus/sounds/Disable") + getMP3S("assets/minecraft/airplus/sounds/Disable")).toTypedArray().takeIf { it.isNotEmpty() }
             ?: arrayOf("None"),
-        getMP3S("assets/minecraft/airclient/sounds/Disable").firstOrNull() ?: "None"
+        getMP3S("assets/minecraft/airplus/sounds/Disable").firstOrNull() ?: "None"
     )
 
     val startupSounds by choices(
         "Startup",
-        getMP3S("assets/minecraft/airclient/sounds/Startup").toTypedArray().takeIf { it.isNotEmpty() }
+        getMP3S("assets/minecraft/airplus/sounds/Startup").toTypedArray().takeIf { it.isNotEmpty() }
             ?: arrayOf("None"),
-        getMP3S("assets/minecraft/airclient/sounds/Startup").firstOrNull() ?: "Air"
+        getMP3S("assets/minecraft/airplus/sounds/Startup").firstOrNull() ?: "Air"
     )
 
     val killSoundEnabled by boolean("KillSound", true)
@@ -47,19 +47,33 @@ object Sound : Module("Sound", Category.CLIENT, canBeEnabled = false) {
     
     val killSounds by choices(
         "Kill",
-        (getWAVS("assets/minecraft/airclient/sounds/Kill") + getMP3S("assets/minecraft/airclient/sounds/Kill")).toTypedArray().takeIf { it.isNotEmpty() }
+        (getWAVS("assets/minecraft/airplus/sounds/Kill") + getMP3S("assets/minecraft/airplus/sounds/Kill")).toTypedArray().takeIf { it.isNotEmpty() }
             ?: arrayOf("None"),
-        (getWAVS("assets/minecraft/airclient/sounds/Kill") + getMP3S("assets/minecraft/airclient/sounds/Kill")).firstOrNull() ?: "None"
+        (getWAVS("assets/minecraft/airplus/sounds/Kill") + getMP3S("assets/minecraft/airplus/sounds/Kill")).firstOrNull() ?: "None"
     ) { killSoundEnabled }
 
     fun playEnableSound() {
         if (enableSounds == "None") return
-        playMP3("airclient/sounds/Enable/${enableSounds}.mp3")
+        playSoundFromFolder("Enable", enableSounds)
     }
 
     fun playDisableSound() {
         if (disableSounds == "None") return
-        playMP3("airclient/sounds/Disable/${disableSounds}.mp3")
+        playSoundFromFolder("Disable", disableSounds)
+    }
+
+    /**
+     * Play a sound from the given folder, preferring WAV and falling back to MP3.
+     */
+    private fun playSoundFromFolder(folder: String, soundName: String) {
+        val basePath = "airplus/sounds/$folder/$soundName"
+        val wavExists = javaClass.getResourceAsStream("/assets/minecraft/$basePath.wav") != null
+        val mp3Exists = javaClass.getResourceAsStream("/assets/minecraft/$basePath.mp3") != null
+
+        when {
+            wavExists -> asyncPlayWav("$basePath.wav")
+            mp3Exists -> playMP3("$basePath.mp3")
+        }
     }
 
     fun playToggleSound(enabled: Boolean) {
@@ -72,7 +86,7 @@ object Sound : Module("Sound", Category.CLIENT, canBeEnabled = false) {
 
     fun playStartupSound() {
         if (startupSounds == "None") return
-        playMP3("airclient/sounds/Startup/${startupSounds}.mp3")
+        playMP3("airplus/sounds/Startup/${startupSounds}.mp3")
     }
 
     fun playKillSound() {
@@ -85,8 +99,8 @@ object Sound : Module("Sound", Category.CLIENT, canBeEnabled = false) {
         }
         lastKillSoundTime = currentTime
         
-        val wavPath = "airclient/sounds/Kill/${killSounds}.wav"
-        val mp3Path = "airclient/sounds/Kill/${killSounds}.mp3"
+        val wavPath = "airplus/sounds/Kill/${killSounds}.wav"
+        val mp3Path = "airplus/sounds/Kill/${killSounds}.mp3"
         
         val wavExists = javaClass.getResourceAsStream("/assets/minecraft/$wavPath") != null
         val mp3Exists = javaClass.getResourceAsStream("/assets/minecraft/$mp3Path") != null

@@ -28,6 +28,13 @@ compileKotlin {
     }
 }
 
+compileJava {
+    doFirst {
+        sourceSets.main.output.resourcesDir.mkdirs()
+    }
+    options.compilerArgs += ["-AoutRefMapFile=${new File(sourceSets.main.output.resourcesDir, "airplus.mixins.refmap.json").absolutePath}"]
+}
+
 minecraft {
     version = "1.8.9-11.15.1.2318-1.8.9"
     runDir = "run"

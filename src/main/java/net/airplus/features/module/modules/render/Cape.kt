@@ -149,7 +149,7 @@ object Cape : Module("Cape", Category.CLIENT) {
             while (entries.hasMoreElements()) {
                 val entry = entries.nextElement()
                 val name = entry.name
-                if (name.startsWith("assets/minecraft/airclient/cape/") && name.endsWith(".png")) {
+                if (name.startsWith("assets/minecraft/airplus/cape/") && name.endsWith(".png")) {
                     val fileName = File(name).name
                     val targetFile = File(capeFolder, fileName)
                     
@@ -181,7 +181,7 @@ object Cape : Module("Cape", Category.CLIENT) {
         try {
             capeFolder.mkdirs()
 
-            // 与 assets/minecraft/airclient/cape 下的实际资源保持一致（overlay.png 为披风覆盖层纹理，不算独立样式）
+            // 与 assets/minecraft/airplus/cape 下的实际资源保持一致（overlay.png 为披风覆盖层纹理，不算独立样式）
             val knownCapes = listOf(
                 "white.png", "vape.png", "styles.png", "styles2.png",
                 "Sherry.png", "ravenxd.png", "ravenanime.png",
@@ -197,7 +197,7 @@ object Cape : Module("Cape", Category.CLIENT) {
                 val targetFile = File(capeFolder, capeName)
                 if (!targetFile.exists()) {
                     try {
-                        val resource = javaClass.classLoader.getResourceAsStream("assets/minecraft/airclient/cape/$capeName")
+                        val resource = javaClass.classLoader.getResourceAsStream("assets/minecraft/airplus/cape/$capeName")
                         if (resource != null) {
                             FileOutputStream(targetFile).use { output ->
                                 resource.copyTo(output)

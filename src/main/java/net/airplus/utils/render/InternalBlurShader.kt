@@ -31,6 +31,8 @@ object InternalBlurShader {
         val sW = (width * factor).toInt()
         val sH = (height * factor).toInt()
 
+        // 保存 scissor 状态：结束时按原样恢复，避免关闭调用方外层已开启的 scissor
+        val prevScissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST)
         glEnable(GL_SCISSOR_TEST)
         // Strictly limit scissor to blur area (no padding) to prevent blur from bleeding outside GUI bounds.
         // Texture sampling is not affected by scissor, so blur quality remains intact.
@@ -97,7 +99,7 @@ object InternalBlurShader {
         GL11.glMatrixMode(GL11.GL_MODELVIEW)
         GL11.glPopMatrix()
 
-        glDisable(GL_SCISSOR_TEST)
+        if (prevScissor) glEnable(GL_SCISSOR_TEST) else glDisable(GL_SCISSOR_TEST)
     }
 
     private fun ensureShaderInitialized() {

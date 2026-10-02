@@ -5,7 +5,9 @@
  */
 package net.airplus.injection.forge.mixins.block;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import net.airplus.features.module.modules.movement.FastClimb;
+import net.airplus.viaversion.vialoadingbase.ViaLoadingBase;
 import net.minecraft.block.BlockLadder;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraftforge.fml.relauncher.Side;
@@ -26,6 +28,11 @@ public abstract class MixinBlockLadder extends MixinBlock {
 
     @ModifyConstant(method = "setBlockBoundsBasedOnState", constant = @Constant(floatValue = 0.125F))
     private float injectAACWallClimb(float constant) {
+        // PacketFix：跨版本（目标协议 >= 1.12.2）时梯子厚度为 0.1875（3/16）
+        if (ViaLoadingBase.getInstance().getTargetVersion().isNewerThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+            return 0.1875f;
+        }
+
         FastClimb fastClimb = FastClimb.INSTANCE;
 
         return fastClimb.handleEvents() && fastClimb.getMode().equals("AAC3.0.0") ? 0.99f : constant;

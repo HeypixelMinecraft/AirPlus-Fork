@@ -10,6 +10,9 @@ import net.airplus.features.command.CommandManager;
 import net.airplus.features.module.modules.misc.ComponentOnHover;
 import net.airplus.features.module.modules.render.HUD;
 import net.airplus.file.configs.models.ClientConfiguration;
+import net.airplus.injection.implementations.IMinecraft;
+import net.airplus.utils.inputfix.GuiScreenFix;
+import net.airplus.utils.inputfix.InputFixInit;
 import net.airplus.utils.render.shader.Background;
 import net.airplus.utils.render.ParticleUtils;
 import net.airplus.utils.render.MenuBackground;
@@ -21,6 +24,7 @@ import net.minecraft.util.ChatStyle;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -56,6 +60,9 @@ public abstract class MixinGuiScreen {
     @Shadow
     public void updateScreen() {
     }
+
+    @Shadow
+    protected abstract void keyTyped(char typedChar, int keyCode);
 
     @Shadow
     public abstract void handleComponentHover(IChatComponent component, int x, int y);
@@ -138,6 +145,27 @@ public abstract class MixinGuiScreen {
     @Overwrite
     protected void actionPerformed(GuiButton button) {
         injectedActionPerformed(button);
+    }
+
+    /**
+     * @author AirClient
+     * @reason Chinese input fix (IME support): route keyboard input through the
+     * platform specific input fix implementation, which also forwards the LWJGL
+     * events carrying actual text (key code 0 with a defined character).
+     */
+    @Overwrite
+    public void handleKeyboardInput() {
+        if (InputFixInit.impl != null) {
+            GuiScreenFix.handleKeyboardInput((GuiScreen) (Object) this);
+        } else {
+            char c = Keyboard.getEventCharacter();
+            int k = Keyboard.getEventKey();
+            if (Keyboard.getEventKeyState() || (k == 0 && Character.isDefined(c))) {
+                this.keyTyped(c, k);
+            }
+        }
+
+        ((IMinecraft) this.mc).airplus$dispatchKeypresses();
     }
 
     protected void injectedActionPerformed(GuiButton button) {

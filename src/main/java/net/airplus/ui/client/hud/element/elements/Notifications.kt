@@ -16,6 +16,7 @@ import net.airplus.ui.client.hud.element.ElementInfo
 import net.airplus.ui.client.hud.element.Side
 import net.airplus.ui.client.hud.element.elements.Notification.Companion.maxTextLength
 import net.airplus.ui.font.Fonts
+import net.airplus.ui.font.GameFontRenderer
 import net.airplus.utils.client.ClientThemesUtils
 import net.airplus.utils.client.ClientUtils
 import net.airplus.utils.extensions.lerpWith
@@ -24,6 +25,7 @@ import net.airplus.utils.render.RenderUtils
 import net.airplus.utils.render.RenderUtils.deltaTime
 import net.airplus.utils.render.RenderUtils.drawRoundedBorder
 import net.airplus.utils.render.RenderUtils.drawRoundedRect
+import net.minecraft.client.gui.FontRenderer
 import net.minecraft.util.ResourceLocation
 import java.awt.Color
 import kotlin.math.sin
@@ -36,7 +38,7 @@ class Notifications(
     x: Double = 0.0, y: Double = 30.0, scale: Float = 1F, side: Side = Side(Side.Horizontal.RIGHT, Side.Vertical.DOWN)
 ) : Element("Notifications", x, y, scale, side) {
 
-    val style by choices("Style", arrayOf("Classic", "Modern", "Compact"), "Modern")
+    val style by choices("Style", arrayOf("Classic", "Modern", "Compact", "Hanabi"), "Modern")
     val horizontalFade by choices("HorizontalFade", arrayOf("InOnly", "OutOnly", "Both", "None"), "OutOnly")
     val padding by int("Padding", 5, 1..20)
     val roundRadius by float("RoundRadius", 3f, 0f..10f)
@@ -44,6 +46,16 @@ class Notifications(
     val renderBorder by boolean("RenderBorder", false)
     val borderColor by color("BorderColor", Color.BLUE.withAlpha(255)) { renderBorder }
     val borderWidth by float("BorderWidth", 2f, 0.5F..5F) { renderBorder }
+
+    // 可自定义字体
+    val titleFont by font("Title-Font", Fonts.fontSemibold40)
+    val descFont by font("Description-Font", Fonts.fontSemibold35)
+
+    // 绘制用字体（保证支持 Float 坐标绘制；选原版字体时回退为默认字体）
+    val titleFontRenderer: GameFontRenderer
+        get() = titleFont as? GameFontRenderer ?: Fonts.fontSemibold40
+    val descFontRenderer: GameFontRenderer
+        get() = descFont as? GameFontRenderer ?: Fonts.fontSemibold35
 
     private val exampleNotification = Notification("Example Title", "Example Description")
 
@@ -75,7 +87,7 @@ class Notifications(
             }
 
             exampleNotification.fadeState = Notification.FadeState.STAY
-            exampleNotification.textLength = Fonts.fontSemibold40.getStringWidth(exampleNotification.longestString)
+            exampleNotification.textLength = titleFont.getStringWidth(exampleNotification.longestString(titleFont))
 
             val notificationHeight = Notification.MAX_HEIGHT
 
@@ -109,8 +121,14 @@ class Notification(
     var y: Float = (notifications.lastOrNull()?.y ?: 0F) + MAX_HEIGHT * 2
     var textLength = 0
 
-    val longestString
-        get() = arrayOf(title, description).maxBy { Fonts.fontSemibold40.getStringWidth(it) }
+    val longestString: String
+        get() = longestString(Fonts.fontSemibold40)
+
+    /**
+     * 按指定字体取较长的一行（自定义字体后各通知的宽度按实际绘制字体计算）。
+     */
+    fun longestString(font: FontRenderer): String =
+        arrayOf(title, description).maxBy { font.getStringWidth(it) }
 
     private var stay = delay
     private var fadeStep = 0F
@@ -154,6 +172,7 @@ class Notification(
         const val ICON_SIZE = 24
         private val MODERN_BG = Color(16, 16, 20, 215)
         private val COMPACT_BG = Color(14, 14, 18, 200)
+        private val HANABI_BG = Color(36, 36, 36, 217).rgb
     }
 
     enum class FadeState {
@@ -166,7 +185,17 @@ class Notification(
     }
 
     fun drawNotification(element: Notifications): Boolean {
-        val notificationWidth = maxTextLength + ICON_SIZE + 16F
+        // Hanabi style: single-line message, width derived from the full text
+        val hanabi = element.style == "Hanabi"
+        val notificationWidth = if (hanabi) {
+            val width = element.titleFontRenderer.getStringWidth("$title $description") + 45F
+            textLength = width.toInt()
+            width
+        } else {
+            // 宽度按所选标题字体实时计算
+            textLength = element.titleFontRenderer.getStringWidth(longestString(element.titleFontRenderer))
+            maxTextLength + ICON_SIZE + 16F
+        }
         val extraSpace = 4F
 
         val currentX = when (fadeState) {
@@ -175,12 +204,11 @@ class Notification(
             else -> x
         }
 
-        if (element.style == "Modern") {
-            drawModern(element, currentX, extraSpace)
-        } else if (element.style == "Compact") {
-            drawCompact(element, currentX, extraSpace)
-        } else {
-            drawClassic(element, currentX, extraSpace)
+        when {
+            hanabi -> drawHanabi(element, currentX, notificationWidth)
+            element.style == "Modern" -> drawModern(element, currentX, extraSpace)
+            element.style == "Compact" -> drawCompact(element, currentX, extraSpace)
+            else -> drawClassic(element, currentX, extraSpace)
         }
 
         val delta = deltaTime
@@ -201,7 +229,7 @@ class Notification(
             FadeState.STAY -> {
                 if (textLength != maxTextLength) {
                     maxTextLength = maxOf(textLength, maxTextLength)
-                    x = maxTextLength + ICON_SIZE + 16F
+                    x = if (hanabi) notificationWidth else maxTextLength + ICON_SIZE + 16F
                     fadeStep = x
                 }
                 stay -= delta
@@ -240,9 +268,9 @@ class Notification(
 
         val nearTopSpot = -y - MAX_HEIGHT + 10
 
-        Fonts.fontSemibold40.drawString(title, ICON_SIZE + 8F - currentX, nearTopSpot - 5, Color.WHITE.rgb)
-        Fonts.fontSemibold35.drawString(
-            description, ICON_SIZE + 8F - currentX, nearTopSpot + Fonts.fontSemibold40.fontHeight - 2, Int.MAX_VALUE
+        element.titleFontRenderer.drawString(title, ICON_SIZE + 8F - currentX, nearTopSpot - 5, Color.WHITE.rgb)
+        element.descFontRenderer.drawString(
+            description, ICON_SIZE + 8F - currentX, nearTopSpot + element.titleFontRenderer.height - 2, Int.MAX_VALUE
         )
 
         RenderUtils.drawImage(
@@ -272,9 +300,9 @@ class Notification(
 
         // 标题 + 描述
         val textX = cardLeft + 31F
-        Fonts.fontSemibold40.drawString(title, textX, cardTop + 5F, Color.WHITE.rgb)
-        Fonts.fontSemibold35.drawString(
-            description, textX, cardTop + 5F + Fonts.fontSemibold40.fontHeight + 1F, Color(170, 170, 170).rgb
+        element.titleFontRenderer.drawString(title, textX, cardTop + 5F, Color.WHITE.rgb)
+        element.descFontRenderer.drawString(
+            description, textX, cardTop + 5F + element.titleFontRenderer.height + 1F, Color(170, 170, 170).rgb
         )
 
         // 底部剩余时间进度条（仅在滑入/停留阶段显示）
@@ -285,6 +313,47 @@ class Notification(
             val barY = cardBottom - 3F
             drawRoundedRect(barLeft, barY, barRight, barY + 1.5F, Color(255, 255, 255, 40).rgb, 0F)
             drawRoundedRect(barLeft, barY, barLeft + (barRight - barLeft) * progress, barY + 1.5F, accentColor.rgb, 0F)
+        }
+    }
+
+    /**
+     * Hanabi 样式：迁移自 cn.hanabi.gui.notifications.Notification。
+     * 深色矩形背景 + 白色单行文字（模块名白色 / Enabled、Disabled 灰色）+
+     * 左侧 severity 圆点 + 底部随时间增长的白色进度条。
+     */
+    private fun drawHanabi(element: Notifications, currentX: Float, notificationWidth: Float) {
+        val height = 22F
+        val cardLeft = -currentX - 4F
+        val cardTop = -y - height
+        val cardBottom = -y
+
+        // 深色背景（Hanabi reAlpha(color, 0.85f)）
+        drawRoundedRect(cardLeft, cardTop, cardLeft + notificationWidth, cardBottom, HANABI_BG, 0F)
+
+        // 底部进度条：随剩余时间增长（Hanabi 用 timer.getLastMs() 计算已流逝比例）
+        if (fadeState == FadeState.IN || fadeState == FadeState.STAY) {
+            val elapsed = (1F - stay / delay.toFloat()).coerceIn(0F, 1F)
+            drawRoundedRect(
+                cardLeft, cardBottom - 1F,
+                cardLeft + (notificationWidth - 4F) * elapsed + 2F, cardBottom,
+                Color(255, 255, 255, 217).rgb, 0F
+            )
+        }
+
+        // severity 圆点（原 icon.ttf 字形已随字体删除，改用主题色圆点表达严重级别）
+        drawRoundedRect(cardLeft + 6F, cardTop + height / 2F - 4F, cardLeft + 14F, cardTop + height / 2F + 4F, accentColor.rgb, 4F)
+
+        // 单行文字：模块名白色，状态（Enabled/Disabled）灰色（文字随所选字体，垂直居中）
+        val textX = cardLeft + 20F
+        val textFont = element.titleFontRenderer
+        val textY = cardTop + (height - textFont.height) / 2F
+        textFont.drawString(title, textX, textY, Color.WHITE.rgb)
+        if (description.isNotEmpty()) {
+            textFont.drawString(
+                description,
+                textX + textFont.getStringWidth(title) + 3F, textY,
+                Color(160, 160, 160).rgb
+            )
         }
     }
 
@@ -325,9 +394,9 @@ class Notification(
 
         // 标题 + 描述
         val textX = cardLeft + 20F
-        Fonts.fontSemibold40.drawString(title, textX, cardTop + 5F, Color.WHITE.rgb)
-        Fonts.fontSemibold35.drawString(
-            description, textX, cardTop + 5F + Fonts.fontSemibold40.fontHeight + 1F, Color(165, 165, 170).rgb
+        element.titleFontRenderer.drawString(title, textX, cardTop + 5F, Color.WHITE.rgb)
+        element.descFontRenderer.drawString(
+            description, textX, cardTop + 5F + element.titleFontRenderer.height + 1F, Color(165, 165, 170).rgb
         )
 
         // 底部剩余时间进度条（仅在滑入/停留阶段显示）

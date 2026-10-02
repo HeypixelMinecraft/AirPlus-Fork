@@ -7,6 +7,10 @@ import org.lwjgl.opengl.EXTPackedDepthStencil
 import org.lwjgl.opengl.GL11.*
 
 object EmbeddedStencil {
+    // 进入 write() 前的调用方状态，dispose() 时恢复，避免污染后续渲染
+    private var prevStencilTest = false
+    private var prevClearStencil = 0
+
     fun checkSetupFBO(framebuffer: Framebuffer?) {
         if (framebuffer != null && framebuffer.depthBuffer > -1) {
             setupFBO(framebuffer)
@@ -25,6 +29,8 @@ object EmbeddedStencil {
 
     fun write(invert: Boolean) {
         checkSetupFBO(Minecraft.getMinecraft().framebuffer)
+        prevStencilTest = glIsEnabled(GL_STENCIL_TEST)
+        prevClearStencil = glGetInteger(GL_STENCIL_CLEAR_VALUE)
         glClearStencil(0)
         glClear(GL_STENCIL_BUFFER_BIT)
         glEnable(GL_STENCIL_TEST)
@@ -54,5 +60,9 @@ object EmbeddedStencil {
 
     fun dispose() {
         glDisable(GL_STENCIL_TEST)
+        // 恢复调用方原有状态：若调用方本就开启了 stencil test 则重新启用，
+        // 并还原 stencil 清除值，避免污染同一帧内其他渲染
+        if (prevStencilTest) glEnable(GL_STENCIL_TEST)
+        glClearStencil(prevClearStencil)
     }
 }

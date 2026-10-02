@@ -17,7 +17,7 @@ import kotlin.concurrent.thread
 
 /**
  * 播放MP3音效（异步）
- * @param resourcePath 资源路径，如 "airclient/sounds/enable/mac.mp3"
+ * @param resourcePath 资源路径，如 "airplus/sounds/enable/mac.mp3"
  */
 fun playMP3(resourcePath: String) {
     thread(start = true) {
@@ -37,7 +37,7 @@ fun playMP3(resourcePath: String) {
 
 /**
  * 播放WAV音效
- * @param resourcePath 资源路径，如 "airclient/sounds/kill/cs2.wav"
+ * @param resourcePath 资源路径，如 "airplus/sounds/kill/cs2.wav"
  */
 fun playWavSound(resourcePath: String) {
     try {
@@ -60,6 +60,7 @@ fun playWavSound(resourcePath: String) {
 
 /**
  * 异步播放WAV音效
+ * 使用 SourceDataLine 流式播放，比 Clip 更可靠（Clip 在游戏运行环境中可能获取音频线失败）
  * @param resourcePath 资源路径
  */
 fun asyncPlayWav(resourcePath: String) {
@@ -70,15 +71,20 @@ fun asyncPlayWav(resourcePath: String) {
                     SoundUtils::class.java.getResourceAsStream("/assets/minecraft/$resourcePath")
                 )
             )
-            val clip = AudioSystem.getClip()
-            clip.open(audioStream)
-            clip.start()
-            
-            while (clip.isRunning) {
-                Thread.sleep(100)
+            val format = audioStream.format
+            val line = AudioSystem.getSourceDataLine(format)
+            line.open(format, 8192)
+            line.start()
+
+            val buffer = ByteArray(4096)
+            var bytesRead: Int
+            while (audioStream.read(buffer).also { bytesRead = it } != -1) {
+                line.write(buffer, 0, bytesRead)
             }
-            
-            clip.close()
+
+            line.drain()
+            line.stop()
+            line.close()
             audioStream.close()
         } catch (e: Throwable) {
             ClientUtils.LOGGER.error("[SoundUtils] 异步播放失败: ${e.message}")
@@ -89,7 +95,7 @@ fun asyncPlayWav(resourcePath: String) {
 
 /**
  * 获取指定目录下的所有MP3文件名（不含扩展名）
- * @param resourcePath 资源目录路径，如 "airclient/sounds/enable"
+ * @param resourcePath 资源目录路径，如 "airplus/sounds/enable"
  * @return 文件名列表 */
 fun getMP3S(resourcePath: String): List<String> {
     val resourceDir = if (resourcePath.endsWith("/")) resourcePath else "$resourcePath/"
@@ -140,7 +146,7 @@ fun getMP3S(resourcePath: String): List<String> {
 
 /**
  * 获取指定目录下的所有WAV文件名（不含扩展名）
- * @param resourcePath 资源目录路径，如 "airclient/sounds/kill"
+ * @param resourcePath 资源目录路径，如 "airplus/sounds/kill"
  * @return 文件名列表 */
 fun getWAVS(resourcePath: String): List<String> {
     val resourceDir = if (resourcePath.endsWith("/")) resourcePath else "$resourcePath/"

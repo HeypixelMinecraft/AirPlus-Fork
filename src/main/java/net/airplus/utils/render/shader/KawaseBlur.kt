@@ -198,6 +198,9 @@ object KawaseBlur {
         // 渲染到主 framebuffer，使用 scissor 限制区域
         mc.framebuffer.bindFramebuffer(true)
 
+        // 保存 scissor 状态：结束时按原样恢复
+        val prevScissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST)
+
         // 计算 scissor 坐标（OpenGL坐标系，原点在左下角）
         // 输入已经是像素坐标，直接转换到OpenGL坐标系
         val scissorX = x
@@ -214,7 +217,7 @@ object KawaseBlur {
         GlStateManager.color(1f, 1f, 1f, 1f)
         ShaderUtil.drawQuads()
 
-        GL11.glDisable(GL11.GL_SCISSOR_TEST)
+        if (prevScissor) GL11.glEnable(GL11.GL_SCISSOR_TEST) else GL11.glDisable(GL11.GL_SCISSOR_TEST)
         GlStateManager.bindTexture(0)
 
         // 恢复进入时的 GL 状态
@@ -297,6 +300,9 @@ object KawaseBlur {
         // 渲染到主 framebuffer，用 scissor 限制只在聊天区域绘制模糊结果
         mc.framebuffer.bindFramebuffer(true)
 
+        // 保存 scissor 状态：结束时按原样恢复
+        val prevScissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST)
+
         GL11.glEnable(GL11.GL_SCISSOR_TEST)
         GL11.glScissor(x, y, width, height)
 
@@ -306,7 +312,7 @@ object KawaseBlur {
         GlStateManager.color(1f, 1f, 1f, 1f)
         ShaderUtil.drawQuads()
 
-        GL11.glDisable(GL11.GL_SCISSOR_TEST)
+        if (prevScissor) GL11.glEnable(GL11.GL_SCISSOR_TEST) else GL11.glDisable(GL11.GL_SCISSOR_TEST)
         GlStateManager.bindTexture(0)
 
         // 恢复进入时的 GL 状态，避免残留 alpha test / blend 影响后续渲染

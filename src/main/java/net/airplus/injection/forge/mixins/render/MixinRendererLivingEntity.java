@@ -62,6 +62,12 @@ public abstract class MixinRendererLivingEntity extends MixinRender {
 
     @Inject(method = "canRenderName(Lnet/minecraft/entity/EntityLivingBase;)Z", at = @At("HEAD"), cancellable = true)
     private <T extends EntityLivingBase> void canRenderName(T entity, CallbackInfoReturnable<Boolean> callbackInfoReturnable) {
+        // NameTags2：开启时取消原版玩家名牌，由模块自绘
+        if (NameTags2.INSTANCE.handleEvents() && entity instanceof net.minecraft.entity.player.EntityPlayer) {
+            callbackInfoReturnable.setReturnValue(false);
+            return;
+        }
+
         if (NameTags.INSTANCE.shouldRenderNameTags(entity)) {
             callbackInfoReturnable.setReturnValue(false);
         }
@@ -174,5 +180,14 @@ public abstract class MixinRendererLivingEntity extends MixinRender {
     @Inject(method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", at = @At(value = "TAIL"))
     private void injectFreeLookPitchPostMovePrevention(CallbackInfo ci) {
         FreeLook.INSTANCE.useModifiedRotation();
+    }
+
+    @Inject(method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", at = @At("HEAD"), cancellable = true)
+    private <T extends EntityLivingBase> void injectMoBendsRender(T entity, double x, double y, double z, float entityYaw, float partialTicks, CallbackInfo ci) {
+        @SuppressWarnings("unchecked")
+        final net.minecraft.client.renderer.entity.RendererLivingEntity<T> renderer = (net.minecraft.client.renderer.entity.RendererLivingEntity<T>) (Object) this;
+        if (MoBendsMod.INSTANCE.onRenderLivingEvent(renderer, entity, x, y, z, entityYaw, partialTicks)) {
+            ci.cancel();
+        }
     }
 }

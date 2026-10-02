@@ -6,5 +6,7 @@
 /.settings/
 /.gradle/
 /.kotlin/
+/buildSrc/.gradle/
+/buildSrc/build/
 /.idea/
 /.trae/

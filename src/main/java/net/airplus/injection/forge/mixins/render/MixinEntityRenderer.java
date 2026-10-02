@@ -6,6 +6,7 @@
 package net.airplus.injection.forge.mixins.render;
 
 import com.google.common.base.Predicates;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import net.airplus.event.EventManager;
 import net.airplus.event.Render3DEvent;
 import net.airplus.features.module.modules.combat.Backtrack;
@@ -15,6 +16,7 @@ import net.airplus.features.module.modules.render.*;
 import net.airplus.utils.client.ClientUtils;
 import net.airplus.utils.rotation.Rotation;
 import net.airplus.utils.rotation.RotationUtils;
+import net.airplus.viaversion.vialoadingbase.ViaLoadingBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -303,7 +305,7 @@ public abstract class MixinEntityRenderer {
             final ArrayList<AxisAlignedBB> boxes = new ArrayList<>(2);
 
             for (Entity entity1 : list) {
-                float f1 = entity1.getCollisionBorderSize();
+                final float f1 = entity1.getCollisionBorderSize();
 
                 boxes.clear();
                 final AxisAlignedBB entityBox = entity1.getEntityBoundingBox();
@@ -344,7 +346,10 @@ public abstract class MixinEntityRenderer {
                 }
             }
 
-            if (pointedEntity != null && flag && vec3.distanceTo(vec33) > (reach.handleEvents() ? reach.getCombatReach() : 3)) {
+            // PacketFix：跨版本（目标协议 >= 1.12.2）时实体拾取最大距离由 3.0 改为 2.9
+            final double maxPickDistance = ViaLoadingBase.getInstance().getTargetVersion().isNewerThanOrEqualTo(ProtocolVersion.v1_12_2) ? 2.9D : 3.0D;
+
+            if (pointedEntity != null && flag && vec3.distanceTo(vec33) > (reach.handleEvents() ? reach.getCombatReach() : maxPickDistance)) {
                 pointedEntity = null;
                 mc.objectMouseOver = new MovingObjectPosition(MovingObjectPosition.MovingObjectType.MISS, Objects.requireNonNull(vec33), null, new BlockPos(vec33));
             }
