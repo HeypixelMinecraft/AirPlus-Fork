@@ -51,13 +51,13 @@ object TargetMark : Module("TargetMark", Category.RENDER) {
 
     private fun drawTargetMark() {
         val texture: ResourceLocation = when (choiceImage) {
-            "Outline" -> ResourceLocation("airclient/targetimage/target.png")
-            "Outline2" -> ResourceLocation("airclient/targetimage/target2.png")
-            "Circle" -> ResourceLocation("airclient/targetimage/glow_circle.png")
-            "CCBlueX" -> ResourceLocation("airclient/targetimage/ccbluex.png")
-            "Cry" -> ResourceLocation("airclient/targetimage/cry.png")
-            "Creeper" -> ResourceLocation("airclient/targetimage/creeper.png")
-            else -> ResourceLocation("airclient/targetimage/target.png")
+            "Outline" -> ResourceLocation("airplus/targetimage/target.png")
+            "Outline2" -> ResourceLocation("airplus/targetimage/target2.png")
+            "Circle" -> ResourceLocation("airplus/targetimage/glow_circle.png")
+            "CCBlueX" -> ResourceLocation("airplus/targetimage/ccbluex.png")
+            "Cry" -> ResourceLocation("airplus/targetimage/cry.png")
+            "Creeper" -> ResourceLocation("airplus/targetimage/creeper.png")
+            else -> ResourceLocation("airplus/targetimage/target.png")
         }
         RenderUtils.drawImage(texture, -16, -16, 32, 32, color)
     }

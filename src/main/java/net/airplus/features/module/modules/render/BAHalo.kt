@@ -36,7 +36,7 @@ object BAHalo : Module("BAHalo", Category.RENDER) {
     private val texture: ResourceLocation
         get() {
             val name = characterIndex.toString().lowercase()
-            return ResourceLocation("airclient/halo/$name.png")
+            return ResourceLocation("airplus/halo/$name.png")
         }
 
     override fun onEnable() {

@@ -54,12 +54,12 @@ object Sound : Module("Sound", Category.CLIENT, canBeEnabled = false) {
 
     fun playEnableSound() {
         if (enableSounds == "None") return
-        playMP3("airclient/sounds/Enable/${enableSounds}.mp3")
+        playMP3("airplus/sounds/Enable/${enableSounds}.mp3")
     }
 
     fun playDisableSound() {
         if (disableSounds == "None") return
-        playMP3("airclient/sounds/Disable/${disableSounds}.mp3")
+        playMP3("airplus/sounds/Disable/${disableSounds}.mp3")
     }
 
     fun playToggleSound(enabled: Boolean) {
@@ -72,7 +72,7 @@ object Sound : Module("Sound", Category.CLIENT, canBeEnabled = false) {
 
     fun playStartupSound() {
         if (startupSounds == "None") return
-        playMP3("airclient/sounds/Startup/${startupSounds}.mp3")
+        playMP3("airplus/sounds/Startup/${startupSounds}.mp3")
     }
 
     fun playKillSound() {
@@ -85,8 +85,8 @@ object Sound : Module("Sound", Category.CLIENT, canBeEnabled = false) {
         }
         lastKillSoundTime = currentTime
         
-        val wavPath = "airclient/sounds/Kill/${killSounds}.wav"
-        val mp3Path = "airclient/sounds/Kill/${killSounds}.mp3"
+        val wavPath = "airplus/sounds/Kill/${killSounds}.wav"
+        val mp3Path = "airplus/sounds/Kill/${killSounds}.mp3"
         
         val wavExists = javaClass.getResourceAsStream("/assets/minecraft/$wavPath") != null
         val mp3Exists = javaClass.getResourceAsStream("/assets/minecraft/$mp3Path") != null

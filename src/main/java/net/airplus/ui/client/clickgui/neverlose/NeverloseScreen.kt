@@ -1940,14 +1940,14 @@ class NeverloseScreen : GuiScreen() {
         val MUTED = Color(0x6A6A78)
         val MODULE_TITLE = Color(0xE8E8F0)
 
-        val SETTING_ICON = ResourceLocation("airclient/clickgui/setting.png")
-        val SEARCH_ICON = ResourceLocation("airclient/clickgui/search2.png")
-        val COMBAT_ICON = ResourceLocation("airclient/clickgui/combat.png")
-        val PLAYER_ICON = ResourceLocation("airclient/clickgui/player.png")
-        val MOVEMENT_ICON = ResourceLocation("airclient/clickgui/movement.png")
-        val RENDER_ICON = ResourceLocation("airclient/clickgui/render.png")
-        val WORLD_ICON = ResourceLocation("airclient/clickgui/world.png")
-        val MISC_ICON = ResourceLocation("airclient/clickgui/misc.png")
-        val EXPLOIT_ICON = ResourceLocation("airclient/clickgui/exploit.png")
+        val SETTING_ICON = ResourceLocation("airplus/clickgui/setting.png")
+        val SEARCH_ICON = ResourceLocation("airplus/clickgui/search2.png")
+        val COMBAT_ICON = ResourceLocation("airplus/clickgui/combat.png")
+        val PLAYER_ICON = ResourceLocation("airplus/clickgui/player.png")
+        val MOVEMENT_ICON = ResourceLocation("airplus/clickgui/movement.png")
+        val RENDER_ICON = ResourceLocation("airplus/clickgui/render.png")
+        val WORLD_ICON = ResourceLocation("airplus/clickgui/world.png")
+        val MISC_ICON = ResourceLocation("airplus/clickgui/misc.png")
+        val EXPLOIT_ICON = ResourceLocation("airplus/clickgui/exploit.png")
     }
 }
