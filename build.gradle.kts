@@ -116,6 +116,12 @@ dependencies {
 
     // Nashorn (JS engine for the script system) - only available on the JDK 8 toolchain
     implementation(files("libs/nashorn.jar"))
+
+    //Via
+    implementation(files("libs/ViaBackwards-4.9.3-SNAPSHOT.jar"))
+    implementation(files("libs/ViaRewind-3.0.7-SNAPSHOT.jar"))
+    implementation(files("libs/ViaSnakeYaml-1.30.jar"))
+    implementation(files("libs/ViaVersion-4.9.4-SNAPSHOT.jar"))
 }
 
 // Tasks
