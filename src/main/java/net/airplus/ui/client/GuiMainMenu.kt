@@ -52,7 +52,7 @@ class GuiMainMenu : AbstractScreen() {
             when {
                 FileManager.firstStart -> showWelcomePopup()
                 hasUpdate() -> showUpdatePopup()
-                shouldShowWarning() -> showDiscontinuedWarning()
+                //shouldShowWarning() -> showDiscontinuedWarning()
             }
             popupOnce = true
         }
