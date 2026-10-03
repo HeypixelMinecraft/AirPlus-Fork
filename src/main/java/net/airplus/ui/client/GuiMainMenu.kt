@@ -54,15 +54,6 @@ class GuiMainMenu : AbstractScreen() {
         private val warningInterval = TimeUnit.DAYS.toMillis(7)
 
         fun shouldShowWarning() = lastWarningTime == null || Instant.now().toEpochMilli() - lastWarningTime!! > warningInterval
-
-        // 启动加载动画状态（Flux GuiLogin stage1/stage2 移植，文案改 AirPlus；static 保证整个生命周期只播一次）
-        private var animationDone = false
-        private var stage1 = true
-        private var stage2 = false
-        private var fontAnimation = 0f
-        private var backAnimation = 1f
-        private var stageStart = 0L
-        private var content = "Loading AirPlus..."
     }
 
     init {
@@ -184,58 +175,18 @@ class GuiMainMenu : AbstractScreen() {
             // 右下 Welcome（Flux 显示登录用户名，这里显示当前游戏会话玩家名）
             val welcome = "Welcome, " + (mc.session?.username ?: "Player")
             Fonts.fontFluxRobotoL.drawStringWithShadow(welcome, width - Fonts.fontFluxRobotoL.getStringWidth(welcome) - 11f, height - 35f, infoColor)
-
-            // 启动加载动画（Flux GuiLogin stage1/stage2，图层最上）
-            if (!animationDone) {
-                if (stage1) {
-                    content = "Loading AirPlus..."
-                    if (fontAnimation < 1f) {
-                        fontAnimation += 0.02f
-                    }
-                    if (fontAnimation >= 1f) {
-                        content = "Welcome to AirPlus!"
-                        if (stageStart == 0L) {
-                            stageStart = System.currentTimeMillis()
-                        } else if (System.currentTimeMillis() - stageStart >= 3500L) {
-                            stage1 = false
-                            stage2 = true
-                        }
-                    }
-                }
-
-                if (stage2) {
-                    fontAnimation = getAnimationState(fontAnimation, 0f, 2f)
-                    backAnimation = getAnimationState(backAnimation, 0f, 2f)
-                    if (fontAnimation == 0f && backAnimation == 0f) {
-                        animationDone = true
-                    }
-                }
-
-                RenderUtils.drawRect(0F, 0F, width.toFloat(), height.toFloat(), reAlpha(0x000000, backAnimation))
-                Fonts.fontFluxRobotoL40.drawCenteredString(
-                    content,
-                    width / 2f,
-                    height / 2f - 24f,
-                    reAlpha(0xFFFFFF, fontAnimation.coerceIn(0f, 1f))
-                )
-            }
         } catch (e: Throwable) {
             e.printStackTrace()
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks)
 
-        if (popup != null && animationDone) {
+        if (popup != null) {
             popup!!.drawScreen(width, height, mouseX, mouseY)
         }
     }
 
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
-        // 启动动画完成前忽略一切点击（Flux 同款）
-        if (!animationDone) {
-            return
-        }
-
         if (popup != null) {
             popup!!.mouseClicked(mouseX, mouseY, mouseButton)
             return

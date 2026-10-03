@@ -164,6 +164,7 @@ object AirPlus {
 
         LOGGER.info("Starting $CLIENT_NAME $clientVersionText $clientCommit, by $CLIENT_AUTHOR")
 
+
         try {
             // Initialize ViaMCP (protocol translation) and its version slider
             runCatching {

@@ -14,6 +14,7 @@ import net.airplus.injection.implementations.IMinecraft;
 import net.airplus.utils.inputfix.GuiScreenFix;
 import net.airplus.utils.inputfix.InputFixInit;
 import net.airplus.utils.render.shader.Background;
+import net.airplus.utils.render.shader.FluxBlobShader;
 import net.airplus.utils.render.ParticleUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
@@ -42,6 +43,12 @@ import static net.minecraft.client.renderer.GlStateManager.disableLighting;
 @Mixin(GuiScreen.class)
 @SideOnly(Side.CLIENT)
 public abstract class MixinGuiScreen {
+    /**
+     * Lazy shared fallback shader used when no custom background file is set.
+     * Kept static so every screen reuses the same GL program (same as the main menu).
+     */
+    private static FluxBlobShader fallbackBlobShader;
+
     @Shadow
     public Minecraft mc;
 
@@ -94,11 +101,17 @@ public abstract class MixinGuiScreen {
             final Background background = AirPlus.INSTANCE.getBackground();
 
             if (background == null) {
-                // No custom background set -> fall back to vanilla background
-                return;
-            }
+                // No custom background file set -> fall back to the built-in blob shader (same as main menu)
+                if (fallbackBlobShader == null)
+                    fallbackBlobShader = new FluxBlobShader();
 
-            background.drawBackground(width, height);
+                if (!fallbackBlobShader.isAvailable())
+                    return; // Shader unavailable -> vanilla background
+
+                fallbackBlobShader.renderShader(width, height);
+            } else {
+                background.drawBackground(width, height);
+            }
 
             if (ClientConfiguration.INSTANCE.getParticles()) {
                 ParticleUtils.INSTANCE.drawParticles(Mouse.getX() * width / mc.displayWidth, height - Mouse.getY() * height / mc.displayHeight - 1);

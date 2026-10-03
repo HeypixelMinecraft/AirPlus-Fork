@@ -184,7 +184,7 @@ class GuiClientConfiguration(val prevGui: GuiScreen) : AbstractScreen() {
             "Background", width / 2F - 98F, height / 4F + 90F, 0xFFFFFF, true
         )
         Fonts.fontSemibold35.drawString(
-            "Supported background types: (.png)",
+            "Supported background types: (.png/.frag) — pick via main menu",
             width / 2F - 98F,
             height / 4F + 100 + 25 * 3,
             0xFFFFFF,
