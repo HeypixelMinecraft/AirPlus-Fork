@@ -277,7 +277,7 @@ public abstract class MixinSplashProgress {
                                 GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
                                 GlStateManager.enableTexture2D();
 
-                                String title = welcome ? "Loading AirPlus..." : "Welcome To AirPlus!";
+                                String title = welcome ? "Welcome To AirPlus!" : "Loading AirPlus...";
                                 long at = welcome ? airplus$welcomeAt : start;
                                 float alpha = Math.min(1f, (System.currentTimeMillis() - at) / 800f);
                                 int titleColor = ((int) (alpha * 255f) << 24) | 0xFFFFFF;
