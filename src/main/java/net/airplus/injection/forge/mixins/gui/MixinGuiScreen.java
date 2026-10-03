@@ -148,27 +148,11 @@ public abstract class MixinGuiScreen {
     }
 
     /**
-     * @author AirClient
-     * @reason Chinese input fix (IME support): route keyboard input through the
-     * platform specific input fix implementation, which also forwards the LWJGL
-     * events carrying actual text (key code 0 with a defined character).
+     * 这里只需几行代码就可以inputfix了
+     * 自https://github.com/Sk1erLLC/Patcher/blob/master/src/main/java/club/sk1er/patcher/mixins/bugfixes/GuiScreenMixin_FixWindowsIME.java
      */
-    @Overwrite
-    public void handleKeyboardInput() {
-        if (InputFixInit.impl != null) {
-            GuiScreenFix.handleKeyboardInput((GuiScreen) (Object) this);
-        } else {
-            char c = Keyboard.getEventCharacter();
-            int k = Keyboard.getEventKey();
-            if (Keyboard.getEventKeyState() || (k == 0 && Character.isDefined(c))) {
-                this.keyTyped(c, k);
-            }
-        }
-
-        ((IMinecraft) this.mc).airplus$dispatchKeypresses();
-    }
-
-    protected void injectedActionPerformed(GuiButton button) {
-
+    @Redirect(method = "handleKeyboardInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
+    private boolean patcher$checkCharacter() {
+        return Keyboard.getEventKey() == 0 && Keyboard.getEventCharacter() >= ' ' || Keyboard.getEventKeyState();
     }
 }
