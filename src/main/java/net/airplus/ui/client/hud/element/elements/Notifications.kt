@@ -444,11 +444,12 @@ class Notification(
         drawArrow(cardLeft + 21F, cardTop + 5F, cardLeft + 27F, cardBottom - 5F, fluxAccentColor.rgb)
 
         // severity 图标：Flux Icon.ttf 字形（A=info B=warning C=error D=success），白色绘制在色条上
+        // RED_SUCCESS（模块禁用）用叉号 "C"，与启用的对勾 "D" 区分
         val fluxIcon = when (severityType) {
             Notifications.SeverityType.INFO -> "A"
             Notifications.SeverityType.WARNING -> "B"
-            Notifications.SeverityType.ERROR -> "C"
-            Notifications.SeverityType.SUCCESS, Notifications.SeverityType.RED_SUCCESS -> "D"
+            Notifications.SeverityType.ERROR, Notifications.SeverityType.RED_SUCCESS -> "C"
+            Notifications.SeverityType.SUCCESS -> "D"
         }
         Fonts.fontFluxIcon.drawString(fluxIcon, cardLeft + 4F, cardTop + (MAX_HEIGHT - 15F) / 2F, Color.WHITE.rgb)
 
@@ -500,13 +501,14 @@ class Notification(
 
     /**
      * Flux 五色强调条（忠实还原 today.flux 配色）。
+     * RED_SUCCESS（模块禁用）与 ERROR 同用红色，和启用的绿色区分。
      */
     private val fluxAccentColor: Color
         get() = when (severityType) {
-            Notifications.SeverityType.SUCCESS, Notifications.SeverityType.RED_SUCCESS -> Color(114, 181, 94)
+            Notifications.SeverityType.SUCCESS -> Color(114, 181, 94)
+            Notifications.SeverityType.RED_SUCCESS, Notifications.SeverityType.ERROR -> Color(240, 71, 71)
             Notifications.SeverityType.INFO -> Color(66, 134, 245)
             Notifications.SeverityType.WARNING -> Color(239, 188, 18)
-            Notifications.SeverityType.ERROR -> Color(240, 71, 71)
         }
 
     /**
@@ -514,7 +516,8 @@ class Notification(
      */
     private val fluxTitleColor: Color
         get() = when (severityType) {
-            Notifications.SeverityType.SUCCESS, Notifications.SeverityType.RED_SUCCESS -> Color(35, 173, 92)
+            Notifications.SeverityType.SUCCESS -> Color(35, 173, 92)
+            Notifications.SeverityType.RED_SUCCESS, Notifications.SeverityType.ERROR -> Color(240, 71, 71)
             else -> fluxAccentColor
         }
 }
