@@ -1,16 +1,16 @@
-package dev.xinxin.utils.mobends;
+package net.airplus.utils.xinxin.mobends;
 
 import com.google.common.collect.Maps;
-import dev.xinxin.utils.mobends.animation.Animation;
-import dev.xinxin.utils.mobends.animation.player.*;
-import dev.xinxin.utils.mobends.animation.spider.Animation_OnGround;
-import dev.xinxin.utils.mobends.animation.spider.Animation_WallClimb;
-import dev.xinxin.utils.mobends.animation.zombie.Animation_Stand;
-import dev.xinxin.utils.mobends.animation.zombie.Animation_Walk;
-import dev.xinxin.utils.mobends.client.renderer.entity.RenderBendsPlayer;
-import dev.xinxin.utils.mobends.client.renderer.entity.RenderBendsSpider;
-import dev.xinxin.utils.mobends.client.renderer.entity.RenderBendsZombie;
-import dev.xinxin.utils.mobends.util.BendsLogger;
+import net.airplus.utils.xinxin.mobends.animation.Animation;
+import net.airplus.utils.xinxin.mobends.animation.player.*;
+import net.airplus.utils.xinxin.mobends.animation.spider.Animation_OnGround;
+import net.airplus.utils.xinxin.mobends.animation.spider.Animation_WallClimb;
+import net.airplus.utils.xinxin.mobends.animation.zombie.Animation_Stand;
+import net.airplus.utils.xinxin.mobends.animation.zombie.Animation_Walk;
+import net.airplus.utils.xinxin.mobends.client.renderer.entity.RenderBendsPlayer;
+import net.airplus.utils.xinxin.mobends.client.renderer.entity.RenderBendsSpider;
+import net.airplus.utils.xinxin.mobends.client.renderer.entity.RenderBendsZombie;
+import net.airplus.utils.xinxin.mobends.util.BendsLogger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.Render;
@@ -52,9 +52,9 @@ public class AnimatedEntity {
     public static void register() {
         BendsLogger.log("Registering Animated Entities...", BendsLogger.INFO);
         animatedEntities.clear();
-        AnimatedEntity.registerEntity(new AnimatedEntity("player", "Player", Minecraft.getMinecraft().thePlayer, EntityPlayer.class, new RenderBendsPlayer(Minecraft.getMinecraft().getRenderManager())).add(new dev.xinxin.utils.mobends.animation.player.Animation_Stand()).add(new dev.xinxin.utils.mobends.animation.player.Animation_Walk()).add(new Animation_Sneak()).add(new Animation_Sprint()).add(new Animation_Jump()).add(new Animation_Attack()).add(new Animation_Swimming()).add(new Animation_Bow()).add(new Animation_Riding()).add(new Animation_Mining()).add(new Animation_Axe()));
+        AnimatedEntity.registerEntity(new AnimatedEntity("player", "Player", Minecraft.getMinecraft().thePlayer, EntityPlayer.class, new RenderBendsPlayer(Minecraft.getMinecraft().getRenderManager())).add(new net.airplus.utils.xinxin.mobends.animation.player.Animation_Stand()).add(new net.airplus.utils.xinxin.mobends.animation.player.Animation_Walk()).add(new Animation_Sneak()).add(new Animation_Sprint()).add(new Animation_Jump()).add(new Animation_Attack()).add(new Animation_Swimming()).add(new Animation_Bow()).add(new Animation_Riding()).add(new Animation_Mining()).add(new Animation_Axe()));
         AnimatedEntity.registerEntity(new AnimatedEntity("zombie", "Zombie", new EntityZombie(null), EntityZombie.class, new RenderBendsZombie(Minecraft.getMinecraft().getRenderManager())).add(new Animation_Stand()).add(new Animation_Walk()));
-        AnimatedEntity.registerEntity(new AnimatedEntity("spider", "Spider", new EntitySpider(null), EntitySpider.class, new RenderBendsSpider(Minecraft.getMinecraft().getRenderManager())).add(new Animation_OnGround()).add(new dev.xinxin.utils.mobends.animation.spider.Animation_Jump()).add(new Animation_WallClimb()));
+        AnimatedEntity.registerEntity(new AnimatedEntity("spider", "Spider", new EntitySpider(null), EntitySpider.class, new RenderBendsSpider(Minecraft.getMinecraft().getRenderManager())).add(new Animation_OnGround()).add(new net.airplus.utils.xinxin.mobends.animation.spider.Animation_Jump()).add(new Animation_WallClimb()));
         playerRenderer = new RenderBendsPlayer(Minecraft.getMinecraft().getRenderManager());
         zombieRenderer = new RenderBendsZombie(Minecraft.getMinecraft().getRenderManager());
         spiderRenderer = new RenderBendsSpider(Minecraft.getMinecraft().getRenderManager());

@@ -1,8 +1,8 @@
-﻿package dev.xinxin.utils.mobends.pack;
+package net.airplus.utils.xinxin.mobends.pack;
 
-import dev.xinxin.utils.mobends.client.model.ModelRendererBends;
-import dev.xinxin.utils.mobends.util.EnumAxis;
-import dev.xinxin.utils.mobends.util.SmoothVector3f;
+import net.airplus.utils.xinxin.mobends.client.model.ModelRendererBends;
+import net.airplus.utils.xinxin.mobends.util.EnumAxis;
+import net.airplus.utils.xinxin.mobends.util.SmoothVector3f;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-﻿package dev.xinxin.utils.mobends.util;
+package net.airplus.utils.xinxin.mobends.util;
 
 public enum BendsLogger {
     INFO,

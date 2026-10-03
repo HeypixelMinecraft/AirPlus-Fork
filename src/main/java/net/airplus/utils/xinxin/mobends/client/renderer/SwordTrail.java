@@ -1,9 +1,9 @@
-﻿package dev.xinxin.utils.mobends.client.renderer;
+package net.airplus.utils.xinxin.mobends.client.renderer;
 
 import net.airplus.features.module.modules.render.MoBendsMod;
-import dev.xinxin.utils.mobends.client.model.ModelRendererBends;
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsPlayer;
-import dev.xinxin.utils.mobends.util.GUtil;
+import net.airplus.utils.xinxin.mobends.client.model.ModelRendererBends;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsPlayer;
+import net.airplus.utils.xinxin.mobends.util.GUtil;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.ReadableVector3f;

@@ -1,4 +1,4 @@
-﻿package dev.xinxin.utils.mobends.data;
+package net.airplus.utils.xinxin.mobends.data;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;

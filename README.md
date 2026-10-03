@@ -79,15 +79,15 @@ net.airplus
 
 ## 技术栈
 
-| 技术 | 用途 |
-|------|------|
+| 技术                                                     | 用途 |
+|--------------------------------------------------------|------|
 | [Mixin](https://github.com/SpongePowered/Mixin) 0.7.11 | 运行时字节码注入 |
-| [Kotlin](https://kotlinlang.org) 2.0.21 + Coroutines | 主要开发语言与异步调度 |
-| [ForgeGradle](https://github.com/MinecraftForge/ForgeGradle) | 构建与开发环境 |
-| [Shadow](https://github.com/johnrengelman/shadow) | 依赖打包 |
-| [DiscordIPC](https://github.com/jagrosh/DiscordIPC) | Discord 状态展示 |
-| [Elixir](https://github.com/CCBlueX/Elixir) | CCBlueX 通用工具库 |
-| FlatLaf | Swing 界面主题 |
+| [Kotlin](https://kotlinlang.org) 2.0.21 + Coroutines   | 主要开发语言与异步调度 |
+| Architectury Loom(以前为ForgeGradle)                      | 构建与开发环境 |
+| [Shadow](https://github.com/johnrengelman/shadow)      | 依赖打包 |
+| [DiscordIPC](https://github.com/jagrosh/DiscordIPC)    | Discord 状态展示 |
+| [Elixir](https://github.com/CCBlueX/Elixir)            | CCBlueX 通用工具库 |
+| FlatLaf                                                | Swing 界面主题 |
 
 ## 贡献
 

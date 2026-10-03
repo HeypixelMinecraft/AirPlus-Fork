@@ -1,6 +1,6 @@
-﻿package dev.xinxin.utils.mobends.pack;
+package net.airplus.utils.xinxin.mobends.pack;
 
-import dev.xinxin.utils.mobends.util.EnumAxis;
+import net.airplus.utils.xinxin.mobends.util.EnumAxis;
 import net.minecraft.util.MathHelper;
 
 import java.util.ArrayList;

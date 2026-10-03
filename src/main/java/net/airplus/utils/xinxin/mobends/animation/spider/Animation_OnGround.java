@@ -1,10 +1,10 @@
-﻿package dev.xinxin.utils.mobends.animation.spider;
+package net.airplus.utils.xinxin.mobends.animation.spider;
 
-import dev.xinxin.utils.mobends.animation.Animation;
-import dev.xinxin.utils.mobends.client.model.ModelRendererBends;
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsSpider;
-import dev.xinxin.utils.mobends.data.Data_Spider;
-import dev.xinxin.utils.mobends.data.EntityData;
+import net.airplus.utils.xinxin.mobends.animation.Animation;
+import net.airplus.utils.xinxin.mobends.client.model.ModelRendererBends;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsSpider;
+import net.airplus.utils.xinxin.mobends.data.Data_Spider;
+import net.airplus.utils.xinxin.mobends.data.EntityData;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntitySpider;

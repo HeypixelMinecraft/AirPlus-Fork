@@ -1,7 +1,7 @@
-﻿package dev.xinxin.utils.mobends.client.renderer.entity.layers;
+package net.airplus.utils.xinxin.mobends.client.renderer.entity.layers;
 
 import com.mojang.authlib.GameProfile;
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsPlayer;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsPlayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;

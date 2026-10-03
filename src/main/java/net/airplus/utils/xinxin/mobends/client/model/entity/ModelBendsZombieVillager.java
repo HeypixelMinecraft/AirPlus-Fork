@@ -1,4 +1,4 @@
-﻿package dev.xinxin.utils.mobends.client.model.entity;
+package net.airplus.utils.xinxin.mobends.client.model.entity;
 
 public class ModelBendsZombieVillager
 extends ModelBendsZombie {

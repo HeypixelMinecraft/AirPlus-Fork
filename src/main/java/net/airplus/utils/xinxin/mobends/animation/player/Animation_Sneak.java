@@ -1,9 +1,9 @@
-﻿package dev.xinxin.utils.mobends.animation.player;
+package net.airplus.utils.xinxin.mobends.animation.player;
 
-import dev.xinxin.utils.mobends.animation.Animation;
-import dev.xinxin.utils.mobends.client.model.ModelRendererBends;
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsPlayer;
-import dev.xinxin.utils.mobends.data.EntityData;
+import net.airplus.utils.xinxin.mobends.animation.Animation;
+import net.airplus.utils.xinxin.mobends.client.model.ModelRendererBends;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsPlayer;
+import net.airplus.utils.xinxin.mobends.data.EntityData;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.MathHelper;

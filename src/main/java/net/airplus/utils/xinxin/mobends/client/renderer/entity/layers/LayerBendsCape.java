@@ -1,6 +1,6 @@
-﻿package dev.xinxin.utils.mobends.client.renderer.entity.layers;
+package net.airplus.utils.xinxin.mobends.client.renderer.entity.layers;
 
-import dev.xinxin.utils.mobends.client.renderer.entity.RenderBendsPlayer;
+import net.airplus.utils.xinxin.mobends.client.renderer.entity.RenderBendsPlayer;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;

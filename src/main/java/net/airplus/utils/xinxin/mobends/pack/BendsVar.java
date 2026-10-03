@@ -1,6 +1,6 @@
-﻿package dev.xinxin.utils.mobends.pack;
+package net.airplus.utils.xinxin.mobends.pack;
 
-import dev.xinxin.utils.mobends.data.EntityData;
+import net.airplus.utils.xinxin.mobends.data.EntityData;
 
 public class BendsVar {
     public static EntityData tempData;

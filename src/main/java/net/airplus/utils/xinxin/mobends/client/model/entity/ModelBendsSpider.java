@@ -1,11 +1,11 @@
-﻿package dev.xinxin.utils.mobends.client.model.entity;
+package net.airplus.utils.xinxin.mobends.client.model.entity;
 
-import dev.xinxin.utils.mobends.AnimatedEntity;
-import dev.xinxin.utils.mobends.client.model.ModelRendererBends;
-import dev.xinxin.utils.mobends.data.Data_Player;
-import dev.xinxin.utils.mobends.data.Data_Spider;
-import dev.xinxin.utils.mobends.pack.BendsPack;
-import dev.xinxin.utils.mobends.util.SmoothVector3f;
+import net.airplus.utils.xinxin.mobends.AnimatedEntity;
+import net.airplus.utils.xinxin.mobends.client.model.ModelRendererBends;
+import net.airplus.utils.xinxin.mobends.data.Data_Player;
+import net.airplus.utils.xinxin.mobends.data.Data_Spider;
+import net.airplus.utils.xinxin.mobends.pack.BendsPack;
+import net.airplus.utils.xinxin.mobends.util.SmoothVector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelSpider;

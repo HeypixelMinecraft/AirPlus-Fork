@@ -1,7 +1,7 @@
-﻿package dev.xinxin.utils.mobends.client.model;
+package net.airplus.utils.xinxin.mobends.client.model;
 
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsPlayer;
-import dev.xinxin.utils.mobends.util.SmoothVector3f;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsPlayer;
+import net.airplus.utils.xinxin.mobends.util.SmoothVector3f;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;

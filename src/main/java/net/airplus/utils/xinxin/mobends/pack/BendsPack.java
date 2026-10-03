@@ -1,9 +1,9 @@
-﻿package dev.xinxin.utils.mobends.pack;
+package net.airplus.utils.xinxin.mobends.pack;
 
-import dev.xinxin.utils.mobends.client.model.ModelRendererBends;
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsPlayer;
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsSpider;
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsZombie;
+import net.airplus.utils.xinxin.mobends.client.model.ModelRendererBends;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsPlayer;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsSpider;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsZombie;
 
 import java.util.ArrayList;
 import java.util.List;

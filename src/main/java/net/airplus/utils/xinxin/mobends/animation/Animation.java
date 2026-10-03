@@ -1,6 +1,6 @@
-﻿package dev.xinxin.utils.mobends.animation;
+package net.airplus.utils.xinxin.mobends.animation;
 
-import dev.xinxin.utils.mobends.data.EntityData;
+import net.airplus.utils.xinxin.mobends.data.EntityData;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.EntityLivingBase;
 

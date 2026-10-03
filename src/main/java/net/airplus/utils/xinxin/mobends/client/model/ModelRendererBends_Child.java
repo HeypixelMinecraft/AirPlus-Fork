@@ -1,4 +1,4 @@
-﻿package dev.xinxin.utils.mobends.client.model;
+package net.airplus.utils.xinxin.mobends.client.model;
 
 import net.minecraft.client.model.ModelBase;
 import org.lwjgl.opengl.GL11;

@@ -1,8 +1,8 @@
-﻿package dev.xinxin.utils.mobends.client.renderer.entity;
+package net.airplus.utils.xinxin.mobends.client.renderer.entity;
 
 import com.google.common.collect.Lists;
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsZombie;
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsZombieVillager;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsZombie;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsZombieVillager;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.entity.RenderBiped;

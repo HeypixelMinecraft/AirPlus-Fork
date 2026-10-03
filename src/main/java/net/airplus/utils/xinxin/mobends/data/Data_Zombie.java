@@ -1,8 +1,8 @@
-﻿package dev.xinxin.utils.mobends.data;
+package net.airplus.utils.xinxin.mobends.data;
 
-import dev.xinxin.utils.mobends.client.model.ModelRendererBends;
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsZombie;
-import dev.xinxin.utils.mobends.util.SmoothVector3f;
+import net.airplus.utils.xinxin.mobends.client.model.ModelRendererBends;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsZombie;
+import net.airplus.utils.xinxin.mobends.util.SmoothVector3f;
 import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;

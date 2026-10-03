@@ -1,6 +1,6 @@
-﻿package dev.xinxin.utils.mobends.client.renderer.entity.layers;
+package net.airplus.utils.xinxin.mobends.client.renderer.entity.layers;
 
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsPlayerArmor;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsPlayerArmor;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.client.renderer.entity.layers.LayerArmorBase;

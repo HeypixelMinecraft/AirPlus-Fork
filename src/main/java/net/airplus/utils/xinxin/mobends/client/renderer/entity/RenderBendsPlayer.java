@@ -1,9 +1,9 @@
-﻿package dev.xinxin.utils.mobends.client.renderer.entity;
+package net.airplus.utils.xinxin.mobends.client.renderer.entity;
 
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsPlayer;
-import dev.xinxin.utils.mobends.client.renderer.entity.layers.LayerBendsCustomHead;
-import dev.xinxin.utils.mobends.client.renderer.entity.layers.LayerBendsPlayerArmor;
-import dev.xinxin.utils.mobends.data.Data_Player;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsPlayer;
+import net.airplus.utils.xinxin.mobends.client.renderer.entity.layers.LayerBendsCustomHead;
+import net.airplus.utils.xinxin.mobends.client.renderer.entity.layers.LayerBendsPlayerArmor;
+import net.airplus.utils.xinxin.mobends.data.Data_Player;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.GlStateManager;

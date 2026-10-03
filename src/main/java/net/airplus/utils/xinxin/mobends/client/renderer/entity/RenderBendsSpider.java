@@ -1,6 +1,6 @@
-﻿package dev.xinxin.utils.mobends.client.renderer.entity;
+package net.airplus.utils.xinxin.mobends.client.renderer.entity;
 
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsSpider;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsSpider;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderSpider;

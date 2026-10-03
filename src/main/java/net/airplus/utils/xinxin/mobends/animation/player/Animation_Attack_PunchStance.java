@@ -1,8 +1,8 @@
-﻿package dev.xinxin.utils.mobends.animation.player;
+package net.airplus.utils.xinxin.mobends.animation.player;
 
-import dev.xinxin.utils.mobends.client.model.ModelRendererBends;
-import dev.xinxin.utils.mobends.client.model.entity.ModelBendsPlayer;
-import dev.xinxin.utils.mobends.data.Data_Player;
+import net.airplus.utils.xinxin.mobends.client.model.ModelRendererBends;
+import net.airplus.utils.xinxin.mobends.client.model.entity.ModelBendsPlayer;
+import net.airplus.utils.xinxin.mobends.data.Data_Player;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class Animation_Attack_PunchStance {

@@ -1,6 +1,6 @@
-﻿package dev.xinxin.utils.mobends.client.model;
+package net.airplus.utils.xinxin.mobends.client.model;
 
-import dev.xinxin.utils.mobends.util.SmoothVector3f;
+import net.airplus.utils.xinxin.mobends.util.SmoothVector3f;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelRenderer;
