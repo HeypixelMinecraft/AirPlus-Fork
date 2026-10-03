@@ -451,13 +451,24 @@ class Notification(
             Notifications.SeverityType.ERROR, Notifications.SeverityType.RED_SUCCESS -> "C"
             Notifications.SeverityType.SUCCESS -> "D"
         }
-        Fonts.fontFluxIcon.drawString(fluxIcon, cardLeft + 4F, cardTop + (MAX_HEIGHT - 15F) / 2F, Color.WHITE.rgb)
+        // 按字体实测宽高在色条内居中（固定值会因字形边界不同而偏移）
+        val iconFont = Fonts.fontFluxIcon
+        val iconWidth = iconFont.getStringWidth(fluxIcon).toFloat()
+        val iconHeight = iconFont.height.toFloat()
+        iconFont.drawString(
+            fluxIcon,
+            cardLeft + (22F - iconWidth) / 2F,
+            cardTop + (MAX_HEIGHT - iconHeight) / 2F,
+            Color.WHITE.rgb
+        )
 
         // 标题（类型色，PoppinsSemiBold）+ 描述（白色，PoppinsRegular），字体锁定为 Flux 原版设计
+        // textTop 取 3F 而非数学居中的 6F：AWT 字形在行高内视觉偏下，整体上移与色条图标对齐
         val textX = cardLeft + 30F
-        Fonts.fontFluxTitle.drawString(title, textX, cardTop + 6F, fluxTitleColor.rgb)
+        val textTop = cardTop + 3F
+        Fonts.fontFluxTitle.drawString(title, textX, textTop, fluxTitleColor.rgb)
         Fonts.fontFluxDesc.drawString(
-            description, textX, cardTop + 6F + Fonts.fontFluxTitle.height + 2F, Color.WHITE.rgb
+            description, textX, textTop + Fonts.fontFluxTitle.height + 2F, Color.WHITE.rgb
         )
     }
 
