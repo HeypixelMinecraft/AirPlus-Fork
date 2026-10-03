@@ -15,7 +15,6 @@ import net.airplus.utils.inputfix.GuiScreenFix;
 import net.airplus.utils.inputfix.InputFixInit;
 import net.airplus.utils.render.shader.Background;
 import net.airplus.utils.render.ParticleUtils;
-import net.airplus.utils.render.MenuBackground;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import net.minecraft.event.ClickEvent;
@@ -95,12 +94,11 @@ public abstract class MixinGuiScreen {
             final Background background = AirPlus.INSTANCE.getBackground();
 
             if (background == null) {
-                // Use built-in menu background image
-                MenuBackground.INSTANCE.drawBackground(width, height);
-            } else {
-                // Use custom background
-                background.drawBackground(width, height);
+                // No custom background set -> fall back to vanilla background
+                return;
             }
+
+            background.drawBackground(width, height);
 
             if (ClientConfiguration.INSTANCE.getParticles()) {
                 ParticleUtils.INSTANCE.drawParticles(Mouse.getX() * width / mc.displayWidth, height - Mouse.getY() * height / mc.displayHeight - 1);

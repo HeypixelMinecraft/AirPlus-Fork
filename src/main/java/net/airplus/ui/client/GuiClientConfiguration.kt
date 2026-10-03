@@ -5,8 +5,6 @@
  */
 package net.airplus.ui.client
 
-import net.airplus.AirPlus.background
-import net.airplus.file.FileManager.backgroundImageFile
 import net.airplus.file.FileManager.saveConfig
 import net.airplus.file.FileManager.valuesConfig
 import net.airplus.file.configs.models.ClientConfiguration.altsLength
@@ -21,10 +19,6 @@ import net.airplus.file.configs.models.ClientConfiguration.updateClientWindow
 import net.airplus.lang.LanguageManager
 import net.airplus.lang.translationMenu
 import net.airplus.ui.font.Fonts
-import net.airplus.utils.io.FileFilters
-import net.airplus.utils.io.MiscUtils
-import net.airplus.utils.io.MiscUtils.showErrorPopup
-import net.airplus.utils.render.shader.Background
 import net.airplus.utils.ui.AbstractScreen
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
@@ -73,9 +67,7 @@ class GuiClientConfiguration(val prevGui: GuiScreen) : AbstractScreen() {
             1, width / 2 - 100, height / 4 + 25 + 75 + 25, "Particles (${if (particles) "On" else "Off"})"
         )
 
-        +GuiButton(2, width / 2 - 100, height / 4 + 25 + 75 + 25 * 2, 98, 20, "Change wallpaper")
-
-        +GuiButton(3, width / 2 + 2, height / 4 + 25 + 75 + 25 * 2, 98, 20, "Reset wallpaper")
+        // (Wallpaper picker removed — background is set from the main menu, local .frag/.png)
 
         // AltManager configuration buttons
         // Location > 3rd row
@@ -151,31 +143,6 @@ class GuiClientConfiguration(val prevGui: GuiScreen) : AbstractScreen() {
                     "${if (stylisedAlts && unformattedAlts) "Max random alt" else "Random alt"} length ("
                 altsSlider.updateSlider()
                 unformattedAltsButton.enabled = stylisedAlts
-            }
-
-            2 -> {
-                val file = MiscUtils.openFileChooser(FileFilters.IMAGE) ?: return
-
-                // Delete old file
-                background = null
-                if (backgroundImageFile.exists()) backgroundImageFile.deleteRecursively()
-
-                // Copy new file
-                background = try {
-                    file.copyTo(backgroundImageFile)
-
-                    // Load new background
-                    Background.fromFile(backgroundImageFile)
-                } catch (e: Exception) {
-                    e.showErrorPopup()
-                    if (backgroundImageFile.exists()) backgroundImageFile.deleteRecursively()
-                    null
-                }
-            }
-
-            3 -> {
-                background = null
-                if (backgroundImageFile.exists()) backgroundImageFile.deleteRecursively()
             }
 
             7 -> {
