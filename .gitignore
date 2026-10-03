@@ -11,3 +11,8 @@
 /.idea/
 /.trae/
 /.workbuddy/
+
+# No VsCode!
+/.vscode/
+
+/.eclipse/
