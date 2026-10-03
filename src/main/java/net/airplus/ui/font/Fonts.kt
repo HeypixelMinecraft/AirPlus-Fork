@@ -109,6 +109,16 @@ object Fonts : MinecraftInstance {
     private fun sessIcon(size: Int): GameFontRenderer =
         getFontOrDefault("SessIcon.ttf", size).asGameFontRenderer()
 
+    // Flux 通知字体（移植自 today.flux FontManager；Icon.ttf 为图标字体，字形 A=info B=warning C=error D=success）。
+    // Flux/Yarukon 字体管线渲染尺寸 = 标称 x0.5，与 Hanabi 同理，此处取 x2 标称尺寸还原原始大小。
+    // 不进 FONT_REGISTRY 注册表，供 Notifications "Flux" 样式内部使用。
+    val fontFluxIcon: GameFontRenderer by lazy { fluxFont("Icon.ttf", 60) }
+    val fontFluxTitle: GameFontRenderer by lazy { fluxFont("PoppinsSemiBold.ttf", 40) }
+    val fontFluxDesc: GameFontRenderer by lazy { fluxFont("PoppinsRegular.ttf", 32) }
+
+    private fun fluxFont(file: String, size: Int): GameFontRenderer =
+        getFontOrDefault(file, size).asGameFontRenderer()
+
     @JvmStatic
     val font24: GameFontRenderer by lazy { fontRegular30 }
     @JvmStatic

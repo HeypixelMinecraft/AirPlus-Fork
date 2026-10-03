@@ -26,6 +26,10 @@ import net.airplus.utils.render.RenderUtils.deltaTime
 import net.airplus.utils.render.RenderUtils.drawRoundedBorder
 import net.airplus.utils.render.RenderUtils.drawRoundedRect
 import net.minecraft.client.gui.FontRenderer
+import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.ResourceLocation
 import java.awt.Color
 import kotlin.math.sin
@@ -38,7 +42,7 @@ class Notifications(
     x: Double = 0.0, y: Double = 30.0, scale: Float = 1F, side: Side = Side(Side.Horizontal.RIGHT, Side.Vertical.DOWN)
 ) : Element("Notifications", x, y, scale, side) {
 
-    val style by choices("Style", arrayOf("Classic", "Modern", "Compact", "Hanabi"), "Modern")
+    val style by choices("Style", arrayOf("Classic", "Modern", "Compact", "Hanabi", "Flux"), "Modern")
     val horizontalFade by choices("HorizontalFade", arrayOf("InOnly", "OutOnly", "Both", "None"), "OutOnly")
     val padding by int("Padding", 5, 1..20)
     val roundRadius by float("RoundRadius", 3f, 0f..10f)
@@ -173,6 +177,7 @@ class Notification(
         private val MODERN_BG = Color(16, 16, 20, 215)
         private val COMPACT_BG = Color(14, 14, 18, 200)
         private val HANABI_BG = Color(36, 36, 36, 217).rgb
+        private val FLUX_BG = Color(38, 41, 43)
     }
 
     enum class FadeState {
@@ -187,8 +192,15 @@ class Notification(
     fun drawNotification(element: Notifications): Boolean {
         // Hanabi style: single-line message, width derived from the full text
         val hanabi = element.style == "Hanabi"
+        // Flux style: width derived from the Flux-native Poppins fonts
+        val flux = element.style == "Flux"
         val notificationWidth = if (hanabi) {
             val width = element.titleFontRenderer.getStringWidth("$title $description") + 45F
+            textLength = width.toInt()
+            width
+        } else if (flux) {
+            // Flux 样式宽度按 Poppins 字体实测（对应 Flux 原版 max(标题, 正文) + 40）
+            val width = Fonts.fontFluxTitle.getStringWidth(longestString(Fonts.fontFluxTitle)) + 45F
             textLength = width.toInt()
             width
         } else {
@@ -208,6 +220,7 @@ class Notification(
             hanabi -> drawHanabi(element, currentX, notificationWidth)
             element.style == "Modern" -> drawModern(element, currentX, extraSpace)
             element.style == "Compact" -> drawCompact(element, currentX, extraSpace)
+            element.style == "Flux" -> drawFlux(element, currentX, extraSpace)
             else -> drawClassic(element, currentX, extraSpace)
         }
 
@@ -229,7 +242,7 @@ class Notification(
             FadeState.STAY -> {
                 if (textLength != maxTextLength) {
                     maxTextLength = maxOf(textLength, maxTextLength)
-                    x = if (hanabi) notificationWidth else maxTextLength + ICON_SIZE + 16F
+                    x = if (hanabi || flux) notificationWidth else maxTextLength + ICON_SIZE + 16F
                     fadeStep = x
                 }
                 stay -= delta
@@ -409,4 +422,99 @@ class Notification(
             drawRoundedRect(barLeft, barY, barLeft + (barRight - barLeft) * progress, barY + 1.2F, accentColor.withAlpha(220).rgb, 0.6F)
         }
     }
+
+    /**
+     * Flux 样式：迁移自 today.flux.gui.hud.notification.Notification（"New" notifMode）。
+     * 深色圆角矩形背景 + 左侧 22px 类型色条 + 色条右缘三角箭头装饰 +
+     * 类型色标题（PoppinsSemiBold）+ 白色描述（PoppinsRegular），severity 图标画在色条上。
+     */
+    private fun drawFlux(element: Notifications, currentX: Float, extraSpace: Float) {
+        val cardLeft = -currentX - extraSpace
+        val cardTop = -y - MAX_HEIGHT
+        val cardBottom = -y
+        val radius = element.roundRadius
+
+        // 深色背景（Flux 0xff26292b）
+        drawRoundedRect(cardLeft, cardTop, 0F, cardBottom, FLUX_BG.rgb, radius)
+
+        // 左侧 22px 类型色条
+        drawRoundedRect(cardLeft, cardTop, cardLeft + 22F, cardBottom, fluxAccentColor.rgb, radius)
+
+        // 色条右缘三角箭头装饰（Flux drawArrow）
+        drawArrow(cardLeft + 21F, cardTop + 5F, cardLeft + 27F, cardBottom - 5F, fluxAccentColor.rgb)
+
+        // severity 图标：Flux Icon.ttf 字形（A=info B=warning C=error D=success），白色绘制在色条上
+        val fluxIcon = when (severityType) {
+            Notifications.SeverityType.INFO -> "A"
+            Notifications.SeverityType.WARNING -> "B"
+            Notifications.SeverityType.ERROR -> "C"
+            Notifications.SeverityType.SUCCESS, Notifications.SeverityType.RED_SUCCESS -> "D"
+        }
+        Fonts.fontFluxIcon.drawString(fluxIcon, cardLeft + 4F, cardTop + (MAX_HEIGHT - 15F) / 2F, Color.WHITE.rgb)
+
+        // 标题（类型色，PoppinsSemiBold）+ 描述（白色，PoppinsRegular），字体锁定为 Flux 原版设计
+        val textX = cardLeft + 30F
+        Fonts.fontFluxTitle.drawString(title, textX, cardTop + 6F, fluxTitleColor.rgb)
+        Fonts.fontFluxDesc.drawString(
+            description, textX, cardTop + 6F + Fonts.fontFluxTitle.height + 2F, Color.WHITE.rgb
+        )
+    }
+
+    /**
+     * Flux 三角箭头装饰，迁移自 today.flux.gui.hud.notification.Notification#drawArrow。
+     */
+    private fun drawArrow(left: Float, top: Float, right: Float, bottom: Float, color: Int) {
+        var l = left
+        var t = top
+        var r = right
+        var b = bottom
+        if (l < r) {
+            val tmp = l
+            l = r
+            r = tmp
+        }
+        if (t < b) {
+            val tmp = t
+            t = b
+            b = tmp
+        }
+        val a = (color shr 24 and 255) / 255.0F
+        val red = (color shr 16 and 255) / 255.0F
+        val green = (color shr 8 and 255) / 255.0F
+        val blue = (color and 255) / 255.0F
+        val worldRenderer = Tessellator.getInstance().worldRenderer
+        GlStateManager.enableBlend()
+        GlStateManager.disableTexture2D()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 1)
+        GlStateManager.color(red, green, blue, a)
+        worldRenderer.begin(7, DefaultVertexFormats.POSITION)
+        worldRenderer.pos(l.toDouble(), (b + 6f).toDouble(), 0.0).endVertex()
+        worldRenderer.pos(r.toDouble(), b.toDouble(), 0.0).endVertex()
+        worldRenderer.pos(r.toDouble(), t.toDouble(), 0.0).endVertex()
+        worldRenderer.pos(l.toDouble(), (t - 6f).toDouble(), 0.0).endVertex()
+        Tessellator.getInstance().draw()
+        GlStateManager.enableTexture2D()
+        GlStateManager.disableBlend()
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 2.0F)
+    }
+
+    /**
+     * Flux 五色强调条（忠实还原 today.flux 配色）。
+     */
+    private val fluxAccentColor: Color
+        get() = when (severityType) {
+            Notifications.SeverityType.SUCCESS, Notifications.SeverityType.RED_SUCCESS -> Color(114, 181, 94)
+            Notifications.SeverityType.INFO -> Color(66, 134, 245)
+            Notifications.SeverityType.WARNING -> Color(239, 188, 18)
+            Notifications.SeverityType.ERROR -> Color(240, 71, 71)
+        }
+
+    /**
+     * Flux 标题颜色（SUCCESS 标题色与强调条色不同）。
+     */
+    private val fluxTitleColor: Color
+        get() = when (severityType) {
+            Notifications.SeverityType.SUCCESS, Notifications.SeverityType.RED_SUCCESS -> Color(35, 173, 92)
+            else -> fluxAccentColor
+        }
 }
