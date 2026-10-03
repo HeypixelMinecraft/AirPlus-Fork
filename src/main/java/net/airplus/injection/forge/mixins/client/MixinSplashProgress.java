@@ -5,6 +5,7 @@
  */
 package net.airplus.injection.forge.mixins.client;
 
+import net.airplus.AirPlus;
 import net.airplus.injection.forge.StartupSplash;
 import net.airplus.ui.font.AWTFontRenderer;
 import net.minecraft.client.Minecraft;
@@ -185,7 +186,7 @@ public abstract class MixinSplashProgress {
             /** Reads a bundled TTF as an AWT font (same files the main menu fonts use). */
             private Font loadTTF(String resourcePath, float size) {
                 try {
-                    InputStream stream = MixinSplashProgress.class.getResourceAsStream(resourcePath);
+                    InputStream stream = AirPlus.class.getResourceAsStream(resourcePath);
                     if (stream == null) {
                         System.out.println("[AirPlus] Splash font resource not found: " + resourcePath);
                         return null;
@@ -222,9 +223,14 @@ public abstract class MixinSplashProgress {
                 glPopMatrix();
             }
 
-            /** Same centering math as GameFontRenderer.drawCenteredString (ortho/scaled units). */
+            /**
+             * AWTFontRenderer pipeline: getStringWidth returns native/2, but the glyphs
+             * are drawn at native/4 (internal glScaled(0.25)). Visual width = 0.5 * W,
+             * so the correct centering offset is W/4 (GameFontRenderer's own drawCenteredString
+             * delegates to AWTFontRenderer units the same way).
+             */
             private void drawCenteredText(AWTFontRenderer renderer, String text, int sw, float y, int color) {
-                float x = sw / 2f - renderer.getStringWidth(text) / 2f;
+                float x = sw / 2f - renderer.getStringWidth(text) / 4f;
                 drawText(renderer, text, x, y, color);
             }
 
