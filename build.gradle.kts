@@ -90,38 +90,41 @@ dependencies {
     }
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
 
-    implementation("com.jagrosh:DiscordIPC:0.4")
+    // All runtime deps go into shadowImpl so shadowJar bundles them into the final mod jar.
+    // (Mixins reference ViaVersion classes at class-transform time; if they are missing
+    // from the production jar the game hard-crashes on LaunchClassLoader.)
+    shadowImpl("com.jagrosh:DiscordIPC:0.4")
 
-    implementation("com.github.CCBlueX:Elixir:1.2.6") {
+    shadowImpl("com.github.CCBlueX:Elixir:1.2.6") {
         exclude(module = "kotlin-stdlib")
         exclude(module = "authlib")
     }
 
-    implementation("org.knowm.xchart:xchart:3.8.8")
+    shadowImpl("org.knowm.xchart:xchart:3.8.8")
 
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14") {
+    shadowImpl("com.squareup.okhttp3:okhttp:5.0.0-alpha.14") {
         exclude(module = "kotlin-stdlib")
     }
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin_version}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlin_coroutines_version}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${kotlin_coroutines_version}")
+    shadowImpl("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin_version}")
+    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlin_coroutines_version}")
+    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-test:${kotlin_coroutines_version}")
 
-    implementation("com.formdev:flatlaf:3.5.4")
+    shadowImpl("com.formdev:flatlaf:3.5.4")
 
-    implementation("javazoom:jlayer:1.0.1")
-    implementation("com.googlecode.soundlibs:mp3spi:1.9.5.4")
+    shadowImpl("javazoom:jlayer:1.0.1")
+    shadowImpl("com.googlecode.soundlibs:mp3spi:1.9.5.4")
 
-    implementation("com.jhlabs:filters:2.0.235-1")
+    shadowImpl("com.jhlabs:filters:2.0.235-1")
 
     // Nashorn (JS engine for the script system) - only available on the JDK 8 toolchain
-    implementation(files("libs/nashorn.jar"))
+    shadowImpl(files("libs/nashorn.jar"))
 
-    //Via
-    implementation(files("libs/ViaBackwards-4.9.3-SNAPSHOT.jar"))
-    implementation(files("libs/ViaRewind-3.0.7-SNAPSHOT.jar"))
-    implementation(files("libs/ViaSnakeYaml-1.30.jar"))
-    implementation(files("libs/ViaVersion-4.9.4-SNAPSHOT.jar"))
+    // Via
+    shadowImpl(files("libs/ViaBackwards-4.9.3-SNAPSHOT.jar"))
+    shadowImpl(files("libs/ViaRewind-3.0.7-SNAPSHOT.jar"))
+    shadowImpl(files("libs/ViaSnakeYaml-1.30.jar"))
+    shadowImpl(files("libs/ViaVersion-4.9.4-SNAPSHOT.jar"))
 }
 
 // Tasks

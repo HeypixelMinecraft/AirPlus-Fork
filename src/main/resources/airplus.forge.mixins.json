@@ -12,6 +12,7 @@
     "block.MixinBlockLilyPad",
     "block.MixinBlockModelRenderer",
     "block.MixinBlockSoulSand",
+    "client.AccessorGuiVideoSettings",
     "client.MixinGameSettings",
     "client.MixinMinecraft",
     "client.MixinMovementInput",

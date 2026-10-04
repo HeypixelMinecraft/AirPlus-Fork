@@ -168,6 +168,20 @@ public abstract class MixinMinecraft implements IMinecraft {
             skipRenderWorld = false;
         }
 
+        // Replace the vanilla video settings screen with the Sodium-style options GUI
+        if (currentScreen instanceof net.minecraft.client.gui.GuiVideoSettings) {
+            net.minecraft.client.gui.GuiScreen parent = ((AccessorGuiVideoSettings) currentScreen).airplus$getParentScreen();
+            if (parent == null) {
+                parent = new net.minecraft.client.gui.GuiOptions(null, gameSettings);
+            }
+
+            currentScreen = new net.airplus.ui.client.sodium.gui.SodiumOptionsGUI(parent);
+
+            ScaledResolution scaledResolution = new ScaledResolution(mc);
+            currentScreen.setWorldAndResolution(mc, scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight());
+            skipRenderWorld = false;
+        }
+
         EventManager.INSTANCE.call(new ScreenEvent(currentScreen));
     }
 

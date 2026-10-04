@@ -14,7 +14,9 @@ object FPSBoost : Module(
 ) {
     // Chunk rebuild worker threads, replaces vanilla's hardcoded 2.
     // Applied on the first rendered frame of a world - changing it requires rejoining a world or restarting.
-    val chunkWorkers by int("ChunkWorkers", (Runtime.getRuntime().availableProcessors() - 1).coerceIn(2, 16), 2..16)
+    // The underlying IntValue is exposed so the Sodium options GUI can bind a slider to it.
+    val chunkWorkersSetting = int("ChunkWorkers", (Runtime.getRuntime().availableProcessors() - 1).coerceIn(2, 16), 2..16)
+    val chunkWorkers by chunkWorkersSetting
 
     // Stop the per-tick torch flicker, lightmap only refreshes every 500ms fallback
     val staticLightmap by boolean("StaticLightmap", true)
