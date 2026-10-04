@@ -124,6 +124,9 @@ object Fonts : MinecraftInstance {
     val fontFluxSans by lazy { fluxFont("sans.ttf", 36) }            // 主按钮文字 (18×2)
     val fontFluxIcon20 by lazy { fluxFont("Icon.ttf", 40) }          // 圆形小按钮图标 (20×2)
 
+    // Flux TabGUI 字体（移植自 today.flux FontManager.normal2 = ArialBold 16，x2 还原）
+    val fontFluxTabGui: GameFontRenderer by lazy { fluxFont("ArialBold.ttf", 32) }
+
     private fun fluxFont(file: String, size: Int): GameFontRenderer =
         getFontOrDefault(file, size).asGameFontRenderer()
 
