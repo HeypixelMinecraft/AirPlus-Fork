@@ -1,4 +1,4 @@
-/run/
+﻿/run/
 /out/
 /logs/
 /build/
@@ -16,3 +16,5 @@
 /.vscode/
 
 /.eclipse/
+
+airplus.code-workspace

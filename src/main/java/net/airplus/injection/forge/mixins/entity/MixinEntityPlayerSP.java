@@ -203,6 +203,12 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer {
             boolean moved = xDiff * xDiff + yDiff * yDiff + zDiff * zDiff > 9.0E-4 || positionUpdateTicks >= 20;
             boolean rotated = !FreeCam.INSTANCE.shouldDisableRotations() && (yawDiff != 0 || pitchDiff != 0);
 
+            // Send deferred block placements (C08) right before the flying packet below. 1.9+ anticheats such as
+            // Grim only validate a placement against the rotation of the tick it arrived in when the place packet
+            // is received shortly before the flying packet, otherwise they fall back to the previous tick's
+            // rotation. Sending both back to back keeps the placement and the rotation consistent.
+            PlayerExtensionKt.flushDeferredPlacements();
+
             if (ridingEntity == null) {
                 if (moved && rotated) {
                     sendQueue.addToSendQueue(new C06PacketPlayerPosLook(motionEvent.getX(), motionEvent.getY(), motionEvent.getZ(), yaw, pitch, motionEvent.getOnGround()));

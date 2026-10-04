@@ -1270,7 +1270,11 @@ object Scaffold : Module("Scaffold", Category.WORLD, Keyboard.KEY_I) {
 
         val prevSize = stack.stackSize
 
-        val clickedSuccessfully = thePlayer.onPlayerRightClick(clickPos, side, hitVec, stack)
+        // Defer the placement (C08) so it is sent right before the rotation packet of this tick. On 1.9+ servers
+        // Grim validates a placement against the rotation of the tick it arrived in, but only when the place
+        // packet is received shortly before the flying packet - otherwise it falls back to the previous tick's
+        // rotation and the placement gets swallowed (see PlayerExtension.flushDeferredPlacements).
+        val clickedSuccessfully = thePlayer.onPlayerRightClick(clickPos, side, hitVec, stack, defer = true)
 
         if (clickedSuccessfully) {
             if (!attempt) {
@@ -1303,7 +1307,7 @@ object Scaffold : Module("Scaffold", Category.WORLD, Keyboard.KEY_I) {
 
             onSuccess()
         } else {
-            if (thePlayer.sendUseItem(stack)) {
+            if (thePlayer.sendUseItem(stack, defer = true)) {
                 if (swing) mc.entityRenderer.itemRenderer.resetEquippedProgress2()
             }
         }

@@ -20,6 +20,7 @@ import net.airplus.injection.implementations.IMinecraft;
 import net.airplus.ui.client.GuiMainMenu;
 import net.airplus.utils.attack.CPSCounter;
 import net.airplus.utils.client.ClientUtils;
+import net.airplus.utils.extensions.PlayerExtensionKt;
 import net.airplus.utils.inventory.SilentHotbar;
 import net.airplus.utils.io.MiscUtils;
 import net.airplus.utils.render.IconUtils;
@@ -211,6 +212,10 @@ public abstract class MixinMinecraft implements IMinecraft {
     @Inject(method = "runTick", at = @At("TAIL"))
     private void injectEndTickEvent(CallbackInfo ci) {
         EventManager.INSTANCE.call(TickEndEvent.INSTANCE);
+
+        // Safety net: placements are normally flushed right before the rotation packet in EntityPlayerSP, but if
+        // that does not run (e.g. the player is not the current view entity) they must not be lost.
+        PlayerExtensionKt.flushDeferredPlacements();
     }
 
     @Inject(method = "runTick", at = @At("TAIL"))

@@ -33,6 +33,7 @@ import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemBlock
 import net.minecraft.item.ItemStack
+import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -216,10 +217,35 @@ infix fun EntityLivingBase.setSprintSafely(new: Boolean) {
     isSprinting = new
 }
 
+/**
+ * Block placements which have to be sent directly in front of the next rotation packet.
+ *
+ * 1.9+ anticheats (e.g. Grim) validate a placement against the rotation of the tick it was sent in, but only
+ * if the placement packet arrives at the server shortly before the flying packet - otherwise they fall back to
+ * the previous tick's rotation because 1.9+ clients can skip ticks. In this client the block placement is sent
+ * during [net.airplus.event.GameTickEvent] (before rendering) while the rotation packet is sent
+ * during the player tick (after rendering), so the two can be up to a whole frame apart and the placement is
+ * validated against a stale rotation, which stacks violations and ends in swallowed blocks on cross-version.
+ *
+ * Deferring the placement and flushing it right before the rotation packet keeps both next to each other.
+ */
+private val deferredPlacements = ArrayDeque<Packet<*>>()
+
+fun queueDeferredPlacement(packet: Packet<*>) {
+    deferredPlacements.add(packet)
+}
+
+fun flushDeferredPlacements() {
+    while (deferredPlacements.isNotEmpty()) {
+        sendPacket(deferredPlacements.removeFirst())
+    }
+}
+
 // Modified mc.playerController.onPlayerRightClick() that sends correct stack in its C08
 fun EntityPlayerSP.onPlayerRightClick(
     clickPos: BlockPos, side: EnumFacing, clickVec: Vec3,
     stack: ItemStack? = inventory.mainInventory[SilentHotbar.currentSlot],
+    defer: Boolean = false,
 ): Boolean {
     val controller = mc.playerController ?: return false
 
@@ -231,7 +257,10 @@ fun EntityPlayerSP.onPlayerRightClick(
     val (facingX, facingY, facingZ) = (clickVec - clickPos.toVec()).toFloatArray()
 
     val sendClick = {
-        sendPacket(C08PacketPlayerBlockPlacement(clickPos, side.index, stack, facingX, facingY, facingZ))
+        val packet = C08PacketPlayerBlockPlacement(clickPos, side.index, stack, facingX, facingY, facingZ)
+
+        if (defer) queueDeferredPlacement(packet) else sendPacket(packet)
+
         true
     }
 
@@ -283,13 +312,15 @@ fun EntityPlayerSP.onPlayerRightClick(
 }
 
 // Modified mc.playerController.sendUseItem() that sends correct stack in its C08
-fun EntityPlayerSP.sendUseItem(stack: ItemStack): Boolean {
+fun EntityPlayerSP.sendUseItem(stack: ItemStack, defer: Boolean = false): Boolean {
     if (mc.playerController.isSpectator)
         return false
 
     mc.playerController?.syncCurrentPlayItem()
 
-    sendPacket(C08PacketPlayerBlockPlacement(stack))
+    val packet = C08PacketPlayerBlockPlacement(stack)
+
+    if (defer) queueDeferredPlacement(packet) else sendPacket(packet)
 
     val prevSize = stack.stackSize
 
