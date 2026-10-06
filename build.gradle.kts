@@ -108,7 +108,6 @@ dependencies {
 
     shadowImpl("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin_version}")
     shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlin_coroutines_version}")
-    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-test:${kotlin_coroutines_version}")
 
     shadowImpl("com.formdev:flatlaf:3.5.4")
 
@@ -185,6 +184,10 @@ tasks.shadowJar {
     exclude("org/apache/log4j/**")
     exclude("org/apache/commons/**")
     exclude("org/junit/**")
+
+    // Merge duplicate META-INF/services descriptors instead of letting one jar
+    // silently overwrite another (critical for coroutines / sound SPI services)
+    mergeServiceFiles()
 }
 
 // Final artifact: remap the shadowed jar (replaces ForgeGradle's reobf)

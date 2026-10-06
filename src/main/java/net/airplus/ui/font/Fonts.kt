@@ -105,6 +105,7 @@ object Fonts : MinecraftInstance {
     val fontSessIcon20: GameFontRenderer by lazy { sessIcon(20) }
     val fontSessIcon24: GameFontRenderer by lazy { sessIcon(24) }
     val fontSessIcon48: GameFontRenderer by lazy { sessIcon(48) }
+    val fontSessIcon60: GameFontRenderer by lazy { sessIcon(60) } // Hanabi 主菜单按钮图标 (sessionInfoIcon30 ×2)
 
     private fun sessIcon(size: Int): GameFontRenderer =
         getFontOrDefault("SessIcon.ttf", size).asGameFontRenderer()

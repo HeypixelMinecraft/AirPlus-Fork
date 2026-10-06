@@ -88,11 +88,10 @@ object Velocity2 : Module("Velocity2", Category.COMBAT) {
         val distance = playerEyes.distanceTo(attackerEyes)
 
         if (distance > WARNING_DISTANCE) {
-            chat(
-                EnumChatFormatting.GRAY.toString() + "[对方封号距离] " + EnumChatFormatting.RED +
-                        String.format("%.2f", distance) + "m" +
-                        EnumChatFormatting.GRAY + " (安全: $WARNING_DISTANCE m)"
-            )
+            val message = "${EnumChatFormatting.GRAY}[对方封号距离] ${EnumChatFormatting.RED}" +
+                String.format("%.2f", distance) + "m" +
+                "${EnumChatFormatting.GRAY} (安全: ${WARNING_DISTANCE}m)"
+            chat(message)
         }
     }
 

@@ -23,7 +23,10 @@ object ClientUpdate {
         try {
             newestVersion = ClientApi.getNewestRelease()
         } catch (e: Exception) {
-            LOGGER.error("Unable to receive update information", e)
+            // Non-fatal: only the update checker depends on this.
+            // Note: GitHub's /releases/latest returns 404 when the repository
+            // has no published (non-draft, non-prerelease) release yet.
+            LOGGER.warn("Unable to receive update information: ${e.message}")
         }
     }
 

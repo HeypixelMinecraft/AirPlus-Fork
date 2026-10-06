@@ -8,6 +8,7 @@ package net.airplus.event
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import net.airplus.event.async.TickScheduler
+import net.airplus.utils.kotlin.SharedScopes
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -39,7 +40,7 @@ internal inline fun <T : Any> createEventMap(valueSelector: (Class<out Event>) -
 /**
  * @author MukjepScarlet
  */
-object EventManager : CoroutineScope by CoroutineScope(SupervisorJob()) {
+object EventManager : CoroutineScope by CoroutineScope(SupervisorJob() + SharedScopes.exceptionHandler) {
     /**
      * All normal handlers (except of scripts) should be initialized at startup on the main thread
      */

@@ -6,23 +6,20 @@
 package net.airplus.ui.client
 
 import net.airplus.AirPlus.CLIENT_NAME
-import net.airplus.AirPlus.background
 import net.airplus.AirPlus.clientVersionText
 import net.airplus.api.ClientUpdate
 import net.airplus.api.ClientUpdate.hasUpdate
 import net.airplus.file.FileManager
-import net.airplus.file.FileManager.backgroundFileFor
-import net.airplus.file.FileManager.existingBackgroundFile
+import net.airplus.file.FileManager.valuesConfig
+import net.airplus.file.configs.models.ClientConfiguration
 import net.airplus.ui.client.altmanager.GuiAltManager
+import net.airplus.ui.client.mainmenu.MainMenuStyles
 import net.airplus.ui.font.Fonts
 import net.airplus.utils.client.JavaVersion
 import net.airplus.utils.client.javaVersion
-import net.airplus.utils.io.FileFilters
 import net.airplus.utils.io.MiscUtils
 import net.airplus.utils.io.MiscUtils.showErrorPopup
 import net.airplus.utils.render.RenderUtils
-import net.airplus.utils.render.shader.Background
-import net.airplus.utils.render.shader.FluxBlobShader
 import net.airplus.utils.ui.AbstractScreen
 import net.minecraft.client.gui.GuiMultiplayer
 import net.minecraft.client.gui.GuiOptions
@@ -43,10 +40,13 @@ import java.util.concurrent.TimeUnit
 class GuiMainMenu : AbstractScreen() {
 
     private var popup: PopupScreen? = null
-    private var blobShader: FluxBlobShader? = null
 
     private val buttons = ArrayList<MenuCardButton>()
     private val roundButtons = ArrayList<MenuCircleButton>()
+
+    // 左下角 Menu Settings 按钮悬停状态
+    private var settingsHovered = false
+    private var settingsHoverAni = 0f
 
     companion object {
         private var popupOnce = false
@@ -83,8 +83,8 @@ class GuiMainMenu : AbstractScreen() {
         buttons.add(MenuCardButton(GuiAltManager(this), "Alt Manager", "M"))
 
         // 右上角圆形小按钮（Flux: Options "N" / Quit Game "O"）+ AirPlus: 本地背景选择 "E"
+        // Background 与 Quit 互换位置：Background 在 Quit 之前
         roundButtons.add(MenuCircleButton(GuiSettingsMenu(this), I18n.format("menu.options"), "N"))
-        roundButtons.add(MenuCircleButton(null, I18n.format("menu.quit"), "O"))
         roundButtons.add(
             MenuCircleButton(
                 null, "Background", "E",
@@ -92,39 +92,17 @@ class GuiMainMenu : AbstractScreen() {
                 rightAction = { resetBackground() }
             )
         )
+        roundButtons.add(MenuCircleButton(null, I18n.format("menu.quit"), "O"))
     }
 
-    /** 左键 "E"：从本地选择背景文件（.png 图片 或 .frag 片段着色器），复制到客户端目录并应用。 */
+    /** 左键 "E"：从本地选择背景文件（.png 图片 或 .frag 片段着色器）并应用。 */
     private fun openBackgroundPicker() {
-        val file = MiscUtils.openFileChooser(FileFilters.IMAGE, FileFilters.SHADER, acceptAll = false) ?: return
-
-        // 替换前释放旧背景的 GL 资源
-        background?.dispose()
-
-        background = try {
-            // 复制到客户端目录（保留扩展名），下次启动时由 FileManager.loadBackground 恢复
-            val target = backgroundFileFor(file.extension)
-            if (target.exists()) target.deleteRecursively()
-            file.copyTo(target)
-
-            try {
-                Background.fromFile(target)
-            } catch (e: Exception) {
-                e.showErrorPopup()
-                target.deleteRecursively()
-                null
-            }
-        } catch (e: Exception) {
-            e.showErrorPopup()
-            null
-        }
+        MainMenuStyles.pickCustomBackground()
     }
 
     /** 右键 "E"：移除自定义背景，恢复默认内置 blob 着色器。 */
     private fun resetBackground() {
-        background?.dispose()
-        background = null
-        existingBackgroundFile()?.deleteRecursively()
+        MainMenuStyles.resetCustomBackground()
     }
 
     override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
@@ -132,22 +110,9 @@ class GuiMainMenu : AbstractScreen() {
             // Flux：不先画一个透明渐变就会白屏（原注释：不绘制这个他就给我白屏了 Strange）
             drawGradientRect(0, 0, this.width, this.height, 0x00FFFFFF, 0x00FFFFFF)
 
-            // 背景：用户选择的本地 .png/.frag 优先；否则内置 blob 着色器动态气泡背景（编译/渲染失败退回深色纯色）
-            val customBackground = background
-            if (customBackground != null) {
-                customBackground.drawBackground(this.width, this.height)
-            } else {
-                var shader = blobShader
-                if (shader == null) {
-                    shader = FluxBlobShader()
-                    blobShader = shader
-                }
-                if (shader.isAvailable) {
-                    shader.renderShader(this.width, this.height)
-                } else {
-                    RenderUtils.drawRect(0F, 0F, width.toFloat(), height.toFloat(), Color(18, 18, 22).rgb)
-                }
-            }
+            // 背景：统一走 MainMenuStyles —— 选中图片时绘制图片；选中 Flux 项时本地自定义背景优先，
+            // 否则内置 blob 着色器动态气泡背景（不可用时退回深色纯色）
+            MainMenuStyles.drawMenuBackground(this.width, this.height, 0)
 
             // 整体压暗 10%（Flux 同款）
             RenderUtils.drawRect(0, 0, width, height, reAlpha(0x000000, 0.1f))
@@ -164,6 +129,26 @@ class GuiMainMenu : AbstractScreen() {
             for (b in roundButtons) {
                 b.draw(startX, 12f, mouseX, mouseY)
                 startX += 36f
+            }
+
+            // 左下角 Menu Settings 按钮（信息栏上方，进入主菜单设置界面）
+            val sBtnW = 110f
+            val sBtnH = 20f
+            val sBtnX = 10f
+            val sBtnY = height - 60f
+            settingsHovered = isHovering(mouseX, mouseY, sBtnX, sBtnY, sBtnX + sBtnW, sBtnY + sBtnH)
+            settingsHoverAni = getAnimationState(settingsHoverAni, if (settingsHovered) 30f else 0f, 200f)
+            val sAni = (settingsHoverAni / 100f).coerceIn(0f, 1f)
+            RenderUtils.drawRoundedRect(sBtnX, sBtnY, sBtnX + sBtnW, sBtnY + sBtnH, Color(0, 0, 0, 200).rgb, 2f)
+            Fonts.fontFluxSans.drawCenteredString(
+                "Menu Settings",
+                sBtnX + sBtnW / 2f,
+                sBtnY + sBtnH / 2f - Fonts.fontFluxSans.height / 2f,
+                reAlpha(0xFFFFFF, 0.8f),
+                true
+            )
+            if (settingsHoverAni > 1f) {
+                RenderUtils.drawRoundedRect(sBtnX, sBtnY, sBtnX + sBtnW, sBtnY + sBtnH, reAlpha(0x000000, sAni), 2f)
             }
 
             // 左下信息栏（alpha 0.6 白字，Flux 同款）
@@ -199,6 +184,12 @@ class GuiMainMenu : AbstractScreen() {
             for (b in roundButtons) {
                 b.onClick(mouseButton)
             }
+        }
+
+        // 左下角 Menu Settings 按钮
+        if (mouseButton == 0 && settingsHovered && popup == null) {
+            mc.displayGuiScreen(GuiMainMenuSettings())
+            return
         }
 
         super.mouseClicked(mouseX, mouseY, mouseButton)
@@ -245,7 +236,13 @@ class GuiMainMenu : AbstractScreen() {
                 0xFFFFFF,
                 true
             )
-            Fonts.fontFluxIcon.drawStringWithShadow(icon, x + 10f, y + 12.5f - Fonts.fontFluxIcon.height / 2f, 0xFFFFFF)
+            // 图标左对齐绘制，垂直居中与文字同规则（不做额外平移补偿）
+            Fonts.fontFluxIcon20.drawStringWithShadow(
+                icon,
+                x + 10f,
+                y + 12.5f - Fonts.fontFluxIcon20.height / 2f,
+                0xFFFFFF
+            )
 
             if (hoverAni > 1f) {
                 RenderUtils.drawRoundedRect(x, y, x + 150f, y + 25f, reAlpha(0x000000, finalAni), 2f)
@@ -289,11 +286,13 @@ class GuiMainMenu : AbstractScreen() {
 
             RenderUtils.drawFilledCircle((x + 14f).toInt(), (y + 14f).toInt(), 14f, Color(0, 0, 0, 200))
             RenderUtils.drawCircle(x + 14f, y + 14f, 14f, 0.5f, 0, 360, Color(0, 0, 0, 200))
-            Fonts.fontFluxIcon20.drawStringWithShadow(
+            // 图标水平+垂直居中：与文字同规则（drawCenteredString 自动按字宽居中），不做额外平移补偿
+            Fonts.fontFluxIcon20.drawCenteredString(
                 icon,
-                x + 14f - Fonts.fontFluxIcon20.getStringWidth(icon) / 2f,
+                x + 14f,
                 y + 14f - Fonts.fontFluxIcon20.height / 2f,
-                0xFFFFFF
+                0xFFFFFF,
+                true
             )
 
             if (alphaAni > 1f) {

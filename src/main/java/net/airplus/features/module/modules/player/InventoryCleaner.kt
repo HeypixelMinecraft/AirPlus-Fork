@@ -60,6 +60,12 @@ object InventoryCleaner : Module("InventoryCleaner", Category.PLAYER) {
 
     private val repairEquipment by boolean("RepairEquipment", true).subjective()
 
+    private val saveArmor by boolean("SaveArmor", false).subjective()
+    private val savedArmorCount by int("SavedArmorCount", 1, 1..3) { saveArmor }.subjective()
+
+    private val saveSwords by boolean("SaveSwords", false).subjective()
+    private val savedSwordCount by int("SavedSwordCount", 1, 1..5) { saveSwords }.subjective()
+
     private val invOpen by +InventoryManager.invOpenValue
     private val simulateInventory by +InventoryManager.simulateInventoryValue
 
@@ -496,7 +502,13 @@ object InventoryCleaner : Module("InventoryCleaner", Category.PLAYER) {
         val item = stack?.item ?: return false
 
         return when (item) {
-            is ItemArmor -> stack in getBestArmorSet(stacks, entityStacksMap)
+            is ItemArmor -> {
+                if (saveArmor) {
+                    isUsefulArmorWithSave(stack, stacks, entityStacksMap)
+                } else {
+                    stack in getBestArmorSet(stacks, entityStacksMap)
+                }
+            }
 
             is ItemTool -> {
                 val blockType = when (item) {
@@ -526,8 +538,12 @@ object InventoryCleaner : Module("InventoryCleaner", Category.PLAYER) {
                 }
 
             is ItemSword ->
-                hasBestParameters(stack, stacks, entityStacksMap) {
-                    it.attackDamage.toFloat()
+                if (saveSwords) {
+                    isUsefulSwordWithSave(stack, stacks, entityStacksMap)
+                } else {
+                    hasBestParameters(stack, stacks, entityStacksMap) {
+                        it.attackDamage.toFloat()
+                    }
                 }
 
             is ItemBow ->
@@ -537,6 +553,110 @@ object InventoryCleaner : Module("InventoryCleaner", Category.PLAYER) {
 
             else -> false
         }
+    }
+
+    private fun isUsefulArmorWithSave(
+        stack: ItemStack, stacks: List<ItemStack?>,
+        entityStacksMap: Map<ItemStack, EntityItem>?
+    ): Boolean {
+        val item = stack.item as ItemArmor
+        val armorType = item.armorType
+
+        val thePlayer = mc.thePlayer ?: return false
+
+        val allArmorsOfSameType = mutableListOf<Pair<Int?, ItemStack>>()
+
+        stacks.forEachIndexed { index, invStack ->
+            if (invStack?.item is ItemArmor && (invStack.item as ItemArmor).armorType == armorType) {
+                allArmorsOfSameType.add(index to invStack)
+            }
+        }
+
+        entityStacksMap?.keys?.forEach { entityStack ->
+            if (entityStack.item is ItemArmor && (entityStack.item as ItemArmor).armorType == armorType) {
+                allArmorsOfSameType.add(-1 to entityStack)
+            }
+        }
+
+        val comparator = compareByDescending<Pair<Int?, ItemStack>> { (_, s) ->
+            calculateArmorValue(s)
+        }.thenByDescending { (_, s) ->
+            s.totalDurability
+        }.thenByDescending { (_, s) ->
+            s.enchantmentSum
+        }
+
+        val sortedArmors = allArmorsOfSameType.sortedWith(comparator)
+
+        val maxKeep = savedArmorCount
+
+        for (i in sortedArmors.indices) {
+            if (i >= maxKeep) break
+            if (sortedArmors[i].second == stack) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    private fun calculateArmorValue(stack: ItemStack): Float {
+        val item = stack.item as? ItemArmor ?: return 0f
+        val baseDefense = item.armorMaterial.getDamageReductionAmount(item.armorType) * 4
+        val protectionLevel = stack.getEnchantmentLevel(Enchantment.protection)
+        val epf = if (protectionLevel > 0) ((6 + protectionLevel * protectionLevel) * 0.75f / 3).toInt() else 0
+
+        return baseDefense / 100f + epf * 0.04f
+    }
+
+    /**
+     * 保存更多剑的逻辑：与保存盔甲一致。
+     *
+     * 收集所有剑（背包 + 地上掉落物），按以下优先级排序：
+     *   1. attackDamage（含锋利附魔加成）从高到低
+     *   2. enchantmentSum（附魔等级总和）从高到低
+     *   3. totalDurability（含耐久附魔的估算耐久）从高到低
+     *
+     * 保留前 [savedSwordCount] 把，其余视为垃圾丢弃。
+     */
+    private fun isUsefulSwordWithSave(
+        stack: ItemStack, stacks: List<ItemStack?>,
+        entityStacksMap: Map<ItemStack, EntityItem>?
+    ): Boolean {
+        val allSwords = mutableListOf<Pair<Int?, ItemStack>>()
+
+        stacks.forEachIndexed { index, invStack ->
+            if (invStack?.item is ItemSword) {
+                allSwords.add(index to invStack)
+            }
+        }
+
+        entityStacksMap?.keys?.forEach { entityStack ->
+            if (entityStack.item is ItemSword) {
+                allSwords.add(-1 to entityStack)
+            }
+        }
+
+        val comparator = compareByDescending<Pair<Int?, ItemStack>> { (_, s) ->
+            s.attackDamage
+        }.thenByDescending { (_, s) ->
+            s.enchantmentSum
+        }.thenByDescending { (_, s) ->
+            s.totalDurability
+        }
+
+        val sortedSwords = allSwords.sortedWith(comparator)
+
+        val maxKeep = savedSwordCount
+
+        for (i in sortedSwords.indices) {
+            if (i >= maxKeep) break
+            if (sortedSwords[i].second == stack) {
+                return true
+            }
+        }
+
+        return false
     }
 
     private fun isUsefulPotion(stack: ItemStack?): Boolean {
