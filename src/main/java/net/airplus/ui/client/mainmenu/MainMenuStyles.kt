@@ -47,13 +47,14 @@ object MainMenuStyles {
     val STYLE_ORBIT = "Orbit"
     val STYLE_HEADER = "Header"
     val STYLE_DIAGONAL = "Diagonal"
+    val STYLE_AUGUSTUS = "Augustus"
 
     // 旧版本配置值迁移（Default -> Flux, Custom -> Hanabi）
     private val LEGACY_NAMES = mapOf("Default" to STYLE_FLUX, "Custom" to STYLE_HANABI)
 
     val STYLES = listOf(
         STYLE_FLUX, STYLE_HANABI, STYLE_HANABI2, STYLE_MINIMAL, STYLE_SIDEBAR, STYLE_DOCK, STYLE_SPLIT,
-        STYLE_GRID, STYLE_ORBIT, STYLE_HEADER, STYLE_DIAGONAL, STYLE_XINXIN
+        STYLE_GRID, STYLE_ORBIT, STYLE_HEADER, STYLE_DIAGONAL, STYLE_AUGUSTUS, STYLE_XINXIN
     )
 
     /** 迁移旧配置里的风格名，保证读取到的总是新名字。 */
@@ -222,6 +223,7 @@ object MainMenuStyles {
         STYLE_ORBIT -> OrbitMainMenu()
         STYLE_HEADER -> HeaderMainMenu()
         STYLE_DIAGONAL -> DiagonalMainMenu()
+        STYLE_AUGUSTUS -> AugustusMainMenu()
         STYLE_XINXIN -> XinxinMainMenu()
         else -> GuiMainMenu()
     }

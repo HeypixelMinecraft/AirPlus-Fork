@@ -105,3 +105,24 @@ net.airplus
 - [CCBlueX / LiquidBounce](https://github.com/CCBlueX/LiquidBounce) — 本项目的基础
 - 所有 LiquidBounce Legacy 社区维护者（@EclipsesDev、@mems01 等）
 - SpongePowered 团队 — Mixin 框架
+
+
+## 联系方式
+<table>
+  <tr>
+    <th align="center">BiliBili</th>
+    <th align="center">QQ</th>
+  </tr>
+  <tr>
+    <td align="center" valign="middle">
+      <a href="https://space.bilibili.com/3706927473232492" target="_blank">
+        <img src="https://i1.hdslb.com/bfs/face/56c31bb4a1201892cadacbeff92e05553b7a419f.jpg" referrerpolicy="no-referrer" width="120" alt="BiliBili">
+      </a>
+    </td>
+    <td align="center" valign="middle">
+      <a href="https://qm.qq.com/q/v5juyh2Wxq" target="_blank">
+        <img src="https://p.qlogo.cn/gh/1127611476/1127611476/640" width="120" alt="BiliBili">
+      </a>
+    </td>
+  </tr>
+</table>
