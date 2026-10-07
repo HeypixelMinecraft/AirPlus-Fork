@@ -8,6 +8,7 @@ package net.airplus.ui.client.mainmenu
 import net.airplus.AirPlus.CLIENT_NAME
 import net.airplus.AirPlus.clientVersionText
 import net.airplus.ui.client.GuiModsMenu
+import net.airplus.ui.client.GuiSettingsMenu
 import net.airplus.ui.client.altmanager.GuiAltManager
 import net.airplus.ui.font.Fonts
 import net.airplus.utils.render.RenderUtils
@@ -45,7 +46,7 @@ class DockMainMenu : AbstractScreen() {
         DockItem("K", "Singleplayer", { mc.displayGuiScreen(GuiSelectWorld(this)) }),
         DockItem("L", "Multiplayer", { mc.displayGuiScreen(GuiMultiplayer(this)) }),
         DockItem("M", "Alt Manager", { mc.displayGuiScreen(GuiAltManager(this)) }),
-        DockItem("N", "Options", { mc.displayGuiScreen(GuiOptions(this, mc.gameSettings)) }),
+        DockItem("N", "Options", { mc.displayGuiScreen(GuiSettingsMenu(this)) }),
         DockItem("", "Mods", { mc.displayGuiScreen(GuiModsMenu(this)) }, "minecraft:airplus/clickgui/folder.png"),
         DockItem("O", "Quit", { mc.shutdown() })
     )

@@ -8,6 +8,7 @@ package net.airplus.ui.client.mainmenu
 import net.airplus.AirPlus.CLIENT_NAME
 import net.airplus.AirPlus.clientVersionText
 import net.airplus.ui.client.GuiModsMenu
+import net.airplus.ui.client.GuiSettingsMenu
 import net.airplus.ui.client.altmanager.GuiAltManager
 import net.airplus.ui.font.Fonts
 import net.airplus.utils.render.RenderUtils
@@ -36,7 +37,7 @@ class MinimalMainMenu : AbstractScreen() {
         Entry("Singleplayer") { mc.displayGuiScreen(GuiSelectWorld(this)) },
         Entry("Multiplayer") { mc.displayGuiScreen(GuiMultiplayer(this)) },
         Entry("Alt Manager") { mc.displayGuiScreen(GuiAltManager(this)) },
-        Entry("Options") { mc.displayGuiScreen(GuiOptions(this, mc.gameSettings)) },
+        Entry("Options") { mc.displayGuiScreen(GuiSettingsMenu(this)) },
         Entry("Mods") { mc.displayGuiScreen(GuiModsMenu(this)) },
         Entry("Quit") { mc.shutdown() }
     )

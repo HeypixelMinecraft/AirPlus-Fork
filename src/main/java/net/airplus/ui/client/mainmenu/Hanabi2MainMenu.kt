@@ -7,6 +7,7 @@ package net.airplus.ui.client.mainmenu
 
 import net.airplus.AirPlus.clientVersionText
 import net.airplus.file.configs.models.ClientConfiguration
+import net.airplus.ui.client.GuiSettingsMenu
 import net.airplus.ui.client.altmanager.GuiAltManager
 import net.airplus.ui.font.Fonts
 import net.airplus.utils.render.BlurUtils
@@ -46,7 +47,7 @@ class Hanabi2MainMenu : AbstractScreen() {
         MenuButton("H", "MultiPlayer") { mc.displayGuiScreen(GuiMultiplayer(this)) },
         MenuButton("I", "AltManager") { mc.displayGuiScreen(GuiAltManager(this)) },
         MenuButton("J", "Mods") { mc.displayGuiScreen(GuiModList(this)) },
-        MenuButton("K", "Options") { mc.displayGuiScreen(GuiOptions(this, mc.gameSettings)) },
+        MenuButton("K", "Options") { mc.displayGuiScreen(GuiSettingsMenu(this)) },
         MenuButton("L", "Languages") { mc.displayGuiScreen(GuiLanguage(this, mc.gameSettings, mc.languageManager)) },
         MenuButton("M", "Quit") { mc.shutdown() }
     )

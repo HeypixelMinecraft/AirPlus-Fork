@@ -7,6 +7,7 @@ package net.airplus.ui.client.mainmenu
 
 import net.airplus.AirPlus.CLIENT_NAME
 import net.airplus.AirPlus.clientVersionText
+import net.airplus.ui.client.GuiSettingsMenu
 import net.airplus.ui.client.altmanager.GuiAltManager
 import net.airplus.ui.font.Fonts
 import net.airplus.utils.render.RenderUtils
@@ -116,7 +117,7 @@ class CustomMainMenu : AbstractScreen() {
                     when (i) {
                         0 -> mc.displayGuiScreen(GuiSelectWorld(this))
                         1 -> mc.displayGuiScreen(GuiMultiplayer(this))
-                        2 -> mc.displayGuiScreen(GuiOptions(this, mc.gameSettings))
+                        2 -> mc.displayGuiScreen(GuiSettingsMenu(this))
                         3 -> mc.displayGuiScreen(GuiAltManager(this))
                     }
                     timer.reset()

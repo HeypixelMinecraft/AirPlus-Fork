@@ -9,6 +9,7 @@ import net.airplus.AirPlus.CLIENT_NAME
 import net.airplus.AirPlus.clientVersionText
 import net.airplus.features.module.ModuleManager
 import net.airplus.features.module.modules.render.ClickGUI
+import net.airplus.ui.client.GuiSettingsMenu
 import net.airplus.ui.font.Fonts
 import net.airplus.utils.render.RenderUtils
 import net.airplus.utils.timing.MSTimer
@@ -37,7 +38,7 @@ class AugustusMainMenu : AbstractScreen() {
         Entry("Singleplayer") { mc.displayGuiScreen(GuiSelectWorld(this)) },
         Entry("Multiplayer") { mc.displayGuiScreen(GuiMultiplayer(this)) },
         Entry("AirPlus") { ModuleManager[ClickGUI::class.java]?.toggle() },
-        Entry("Options...") { mc.displayGuiScreen(GuiOptions(this, mc.gameSettings)) },
+        Entry("Options...") { mc.displayGuiScreen(GuiSettingsMenu(this)) },
         Entry("Quit Game") { mc.shutdown() }
     )
 
@@ -96,8 +97,9 @@ class AugustusMainMenu : AbstractScreen() {
         smallFont.drawString(mc.session.username, l.padX, 14f + topFont.height + 3f, Color(170, 180, 186).rgb)
 
         // ===== 4. 边栏中部蓝色按钮组 =====
-        val labelFont = Fonts.fontFluxSans
-        val labelH = labelFont.height
+        // 按钮文字用 MC 原版像素字体（与 logo 同源，Augustus 原版观感）
+        val fr = mc.fontRendererObj
+        val labelH = fr.FONT_HEIGHT
         for (i in entries.indices) {
             val bx = l.padX
             val by = l.btnY0 + i * (l.btnH + l.gap)
@@ -109,9 +111,9 @@ class AugustusMainMenu : AbstractScreen() {
 
             RenderUtils.drawRoundedRect(bx, by, bx + l.btnW, by + l.btnH, lerpColor(BTN_COLOR, BTN_HOVER, p).rgb, 2f)
 
-            val tx = bx + l.btnW / 2f - labelFont.getStringWidth(entries[i].label) / 2f
+            val tx = bx + l.btnW / 2f - fr.getStringWidth(entries[i].label) / 2f
             val ty = by + (l.btnH - labelH) / 2f
-            labelFont.drawString(entries[i].label, tx, ty, Color(240, 244, 248).rgb)
+            fr.drawStringWithShadow(entries[i].label, tx, ty, Color(240, 244, 248).rgb)
         }
 
         // ===== 5. 主区居中像素风大 logo（原版字体放大 3 倍）=====
@@ -129,7 +131,7 @@ class AugustusMainMenu : AbstractScreen() {
         smallFont.drawString(statsText, width - 10f - stW, 10f, Color(200, 210, 216).rgb)
 
         // ===== 7. 左下版本号 / 右下制作组（避让右下 Menu Settings 按钮）=====
-        smallFont.drawString("b$clientVersionText", 10f, height - 14f, Color(200, 210, 216).rgb)
+        smallFont.drawString("$clientVersionText", 10f, height - 14f, Color(200, 210, 216).rgb)
         val creditW = smallFont.getStringWidth(CREDIT)
         smallFont.drawString(CREDIT, width - 10f - creditW, height - 40f, Color(180, 190, 196, 200).rgb)
 

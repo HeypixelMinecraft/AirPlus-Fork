@@ -5,6 +5,7 @@
  */
 package net.airplus.ui.client.mainmenu
 
+import net.airplus.ui.client.GuiSettingsMenu
 import net.airplus.ui.client.altmanager.GuiAltManager
 import net.airplus.ui.font.Fonts
 import net.airplus.utils.render.RenderUtils
@@ -30,7 +31,7 @@ class XinxinMainMenu : AbstractScreen() {
         MenuButton("单人世界") { mc.displayGuiScreen(GuiSelectWorld(this)) },
         MenuButton("多人世界") { mc.displayGuiScreen(GuiMultiplayer(this)) },
         MenuButton("§l§e账号管理") { mc.displayGuiScreen(GuiAltManager(this)) },
-        MenuButton("游戏设置") { mc.displayGuiScreen(GuiOptions(this, mc.gameSettings)) },
+        MenuButton("游戏设置") { mc.displayGuiScreen(GuiSettingsMenu(this)) },
         MenuButton("退出游戏") { mc.shutdown() }
     )
 

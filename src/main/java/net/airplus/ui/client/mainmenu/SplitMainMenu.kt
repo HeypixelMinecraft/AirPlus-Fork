@@ -8,6 +8,7 @@ package net.airplus.ui.client.mainmenu
 import net.airplus.AirPlus.CLIENT_NAME
 import net.airplus.AirPlus.clientVersionText
 import net.airplus.ui.client.GuiModsMenu
+import net.airplus.ui.client.GuiSettingsMenu
 import net.airplus.ui.client.altmanager.GuiAltManager
 import net.airplus.ui.font.Fonts
 import net.airplus.utils.render.RenderUtils
@@ -36,7 +37,7 @@ class SplitMainMenu : AbstractScreen() {
         Entry("Singleplayer", "Start your local adventure") { mc.displayGuiScreen(GuiSelectWorld(this)) },
         Entry("Multiplayer", "Connect to online servers") { mc.displayGuiScreen(GuiMultiplayer(this)) },
         Entry("Alt Manager", "Manage your accounts") { mc.displayGuiScreen(GuiAltManager(this)) },
-        Entry("Options", "Tune game settings") { mc.displayGuiScreen(GuiOptions(this, mc.gameSettings)) },
+        Entry("Options", "Tune game settings") { mc.displayGuiScreen(GuiSettingsMenu(this)) },
         Entry("Mods", "Browse client modules") { mc.displayGuiScreen(GuiModsMenu(this)) },
         Entry("Quit", "Exit the game") { mc.shutdown() }
     )
